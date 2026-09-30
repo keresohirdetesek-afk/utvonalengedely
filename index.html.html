@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Útvonalengedély bekérő</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d49a1f;--gold-soft:#e7c66a;--slate:#b9c5d6;--ink:#1f2530;--line:#1f2530;--bg:#f3f5f8;--card:#ffffff;--border:#dde2e9;--txt:#2a3140;--muted:#7a8595;--accent:#c8961a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Hanken Grotesk',sans-serif;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;line-height:1.45;}
+  .topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .langsel{flex:0 0 auto;font-family:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:9px;padding:9px 8px;background:#fff;color:var(--txt);cursor:pointer;}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  .brand-mark{width:34px;height:34px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,var(--gold),#9c7212);display:grid;place-items:center;color:#fff;font-weight:700;font-family:'Saira Condensed';font-size:20px;}
+  .brand h1{font-family:'Saira Condensed';font-weight:700;font-size:17px;letter-spacing:.3px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .brand span{font-size:11px;color:var(--muted);display:block;margin-top:2px;}
+  .printbtn{flex:0 0 auto;font-weight:700;font-size:14px;border:none;cursor:pointer;background:var(--gold);color:#fff;padding:11px 16px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;}
+  .printbtn.alt{background:#fff;color:var(--accent);border:1.5px solid var(--gold);}
+  .printbtn:active{transform:translateY(1px);}
+  .sendbtn{width:100%;margin-top:4px;background:var(--gold);border:none;color:#fff;font-weight:700;font-size:14px;padding:12px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+  .sendbtn:active{transform:translateY(1px);}
+  .dia-toggle{display:none;}
+  .chk{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--txt);cursor:pointer;line-height:1.35;margin-bottom:0;}
+  .chk input{width:auto;margin-top:2px;flex:0 0 auto;}
+  .upbtn{width:100%;background:#fff;border:1.5px dashed var(--border);color:var(--txt);font-weight:600;font-size:13px;padding:14px 8px;border-radius:10px;cursor:pointer;}
+  .upbtn:hover{border-color:var(--gold);color:var(--accent);}
+  .upload .lab{margin-bottom:6px;}
+  .thumb{width:100%;max-height:150px;object-fit:contain;border-radius:9px;margin-top:8px;border:1px solid var(--border);background:#f7f8fb;}
+  .forgwrap{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);}
+  .doc-forg{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-top:2.5px solid var(--line);}
+  .doc-forg figure{margin:0;}
+  .doc-forg figcaption{font-size:11px;font-weight:700;text-transform:uppercase;color:#5b6573;margin-bottom:4px;text-align:center;}
+  .doc-forg img{width:100%;border:1.5px solid var(--line);border-radius:4px;display:block;}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 14px 70px;}
+  .inputs{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:20px;}
+  @media(min-width:740px){.inputs{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1080px){.inputs{grid-template-columns:repeat(3,1fr);}}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;min-width:0;}
+  .card h2{font-family:'Saira Condensed';text-transform:uppercase;font-size:15px;letter-spacing:.6px;color:var(--accent);margin-bottom:13px;display:flex;align-items:center;gap:8px;}
+  .card h2 svg{width:18px;height:18px;flex:0 0 auto;color:var(--gold);}
+  .addbtn{width:100%;margin-top:4px;background:#fff;border:1.5px dashed var(--gold);color:var(--accent);font-weight:700;font-size:13px;padding:10px;border-radius:10px;cursor:pointer;}
+  .addbtn:hover{background:rgba(212,154,31,.08);}
+  .trailer-row{border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:10px;background:#fafbfc;}
+  .trailer-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px;}
+  .delbtn{background:none;border:none;color:#c0563f;font-size:20px;line-height:1;cursor:pointer;padding:0 4px;}
+  .delbtn:hover{color:#a23b27;}
+  label{display:block;margin-bottom:12px;}
+  label:last-child{margin-bottom:0;}
+  .lab{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;}
+  input,textarea{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--txt);font-family:inherit;font-size:16px;font-weight:500;padding:10px 12px;border-radius:10px;outline:none;transition:border-color .15s,box-shadow .15s;}
+  textarea{resize:vertical;min-height:48px;}
+  input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,154,31,.16);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .axgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:9px;}
+  .axcell .lab{font-size:11px;}
+  .axcell input{padding:8px 9px;font-size:15px;text-align:center;}
+  .help{font-size:12px;color:var(--muted);margin-top:8px;}
+  .resetbtn{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--muted);font-weight:600;font-size:13px;padding:11px;border-radius:10px;cursor:pointer;}
+  .resetbtn:hover{border-color:var(--muted);color:var(--txt);}
+
+  /* preview */
+  .preview .ptitle{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px;padding-left:2px;}
+  .doc-scroll{background:#e9ecf1;border:1px solid var(--border);border-radius:14px;padding:12px;overflow:auto;}
+  #doc{background:#fff;color:var(--ink);width:100%;max-width:720px;margin:0 auto;border:2.5px solid var(--line);}
+  .d-title{text-align:center;font-family:'Saira Condensed';font-weight:700;font-size:30px;letter-spacing:3px;text-transform:uppercase;padding:9px;border-bottom:2.5px solid var(--line);}
+  table.d{width:100%;border-collapse:collapse;table-layout:fixed;}
+  table.d td{border:1.5px solid var(--line);padding:7px 10px;font-size:14px;vertical-align:middle;word-wrap:break-word;overflow-wrap:anywhere;}
+  .ce{display:inline-block;min-width:18px;}
+  [contenteditable="true"]{outline:none;cursor:text;}
+  [contenteditable="true"]:hover{box-shadow:inset 0 -2px 0 rgba(212,154,31,.45);}
+  [contenteditable="true"]:focus{background:rgba(212,154,31,.20);border-radius:3px;}
+  .lg{background:var(--gold-soft);font-weight:700;text-align:center;text-transform:uppercase;font-size:12px;letter-spacing:.4px;}
+  .lgl{background:var(--gold-soft);font-weight:700;text-transform:uppercase;font-size:12.5px;letter-spacing:.4px;}
+  .data{background:var(--slate);font-weight:600;}
+  .big{background:var(--slate);font-weight:700;font-size:18px;text-align:center;}
+  .ctr{text-align:center;}
+  .sp td{border:none;height:8px;background:#fff;padding:0;}
+  .company{background:var(--slate);text-align:center;font-family:'Saira Condensed';font-weight:700;font-size:23px;letter-spacing:1px;text-transform:uppercase;}
+  .split{display:grid;grid-template-columns:1fr 1fr;border-top:2.5px solid var(--line);}
+  @media(max-width:520px){.split{grid-template-columns:1fr;}}
+  .at{width:100%;border-collapse:collapse;}
+  .at td{border:1.5px solid var(--line);padding:6px 9px;font-size:13.5px;}
+  .at .n{background:var(--slate);font-weight:700;text-align:left;font-size:12px;}
+  .at .v{background:var(--slate);font-weight:700;text-align:center;width:80px;}
+  .at .h{background:var(--gold-soft);font-weight:700;text-transform:uppercase;font-size:11.5px;letter-spacing:.4px;text-align:center;}
+
+  .axle-legend{font-size:12px;color:var(--muted);margin-bottom:13px;}
+  .axle-vis{display:flex;align-items:flex-start;overflow-x:auto;padding:4px 2px 6px;}
+  .axle{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 auto;width:66px;}
+  .wheel{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:grid;place-items:center;font-family:'Saira Condensed';font-weight:700;font-size:19px;color:var(--ink);position:relative;}
+  .wheel.trailer{border-color:#9aa6b5;color:#5b6573;}
+  .wheel.driven{background:var(--gold-soft);border-color:#9c7212;color:#1f2530;}
+  .wheel .hbadge{position:absolute;top:-7px;right:-7px;background:var(--gold);color:#fff;font-size:9px;font-weight:700;border-radius:6px;padding:1px 4px;font-family:'Hanken Grotesk';}
+  .gap{height:46px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:80px;}
+  .axle-vis input{text-align:center;padding:7px 4px;font-size:15px;width:56px;}
+  .gap input{width:68px;font-size:14px;}
+  .grp-row{display:flex;margin-top:6px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
+  .full{grid-column:1/-1;}
+  .sub{font-weight:700;font-size:12px;color:var(--muted);margin:4px 0 9px;text-transform:uppercase;letter-spacing:.4px;}
+  .ingrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:9px;}
+  .incell{background:#f7f8fb;border:1px solid var(--border);border-radius:10px;padding:7px 6px;text-align:center;}
+  .incell .lab{font-size:11px;margin-bottom:5px;text-align:center;color:var(--muted);}
+  .incell input{padding:8px 6px;font-size:15px;text-align:center;background:#fff;}
+  #axleDiagram{overflow:hidden;width:100%;min-width:0;margin-bottom:16px;}
+  @media(max-width:739px){
+    .dia-toggle{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;background:#fff;border:1.5px dashed var(--gold);color:var(--accent);font-weight:700;font-size:13px;padding:11px;border-radius:10px;cursor:pointer;margin-bottom:12px;}
+    #axleDiagram{display:none;}
+    #axleDiagram.show{display:block;}
+  }
+  .dia-row{display:inline-flex;align-items:flex-end;white-space:nowrap;}
+  .dia-axle{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;width:56px;}
+  .dia-load{font-weight:700;font-size:13px;color:#5b6573;height:16px;}
+  .dia-wheel{width:48px;height:48px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:grid;place-items:center;font-family:'Saira Condensed';font-weight:700;font-size:20px;color:var(--ink);position:relative;}
+  .dia-wheel::before{content:"";position:absolute;inset:6px;border-radius:50%;border:2px solid rgba(31,37,48,.16);}
+  .dia-wheel.trailer{border-color:#9aa6b5;color:#5b6573;}
+  .dia-wheel.driven{background:var(--gold-soft);border-color:#9c7212;color:#1f2530;}
+  .dia-wheel .hb{position:absolute;top:-7px;right:-7px;background:var(--gold);color:#fff;font-size:9px;font-weight:700;border-radius:6px;padding:1px 4px;font-family:'Hanken Grotesk';}
+  .dia-gap{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:0 0 auto;padding-bottom:24px;}
+  .dia-dist{font-weight:700;font-size:12px;color:var(--ink);margin-bottom:5px;white-space:nowrap;}
+  .dia-dim{width:100%;height:0;border-top:2px solid #aab4c2;position:relative;}
+  .dia-dim::before,.dia-dim::after{content:"";position:absolute;top:-5px;width:2px;height:10px;background:#aab4c2;}
+  .dia-dim::before{left:0;}
+  .dia-dim::after{right:0;}
+  .dia-dim.coupling{border-top-color:var(--gold);border-top-style:dashed;}
+  .dia-dim.coupling::before,.dia-dim.coupling::after{background:var(--gold);}
+
+  @media print{
+    @page{size:A4 portrait;margin:12mm;}
+    html,body{background:#fff!important;}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+    .topbar,.inputs,.ptitle{display:none!important;}
+    .wrap{padding:0;max-width:none;}
+    .preview{margin:0;}
+    .doc-scroll{border:none;background:#fff;padding:0;overflow:visible;}
+    #doc{max-width:none;box-shadow:none;border:2.5px solid var(--line);}
+    [contenteditable="true"]:hover{box-shadow:none!important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><div class="brand-mark">Ú</div><div><h1 data-i18n="app_title">Útvonalengedély bekérő</h1><span data-i18n="app_sub">Egyszerű adatbevitel</span></div></div>
+  <div style="display:flex;gap:8px;flex:0 0 auto;align-items:center;">
+    <select class="langsel" id="lang" onchange="applyLang(this.value)" aria-label="Nyelv / Language">
+      <option value="hu">HU</option><option value="en">EN</option><option value="de">DE</option><option value="ro">RO</option><option value="sk">SK</option><option value="cs">CZ</option><option value="pl">PL</option><option value="sl">SLO</option><option value="at">A</option><option value="uk">UA</option><option value="ru">RUS</option><option value="lt">LT</option><option value="lv">LV</option><option value="hr">HR</option><option value="bg">BG</option><option value="nl">NL</option><option value="be">B</option><option value="sv">S</option><option value="fr">FR</option><option value="es">ESP</option><option value="pt">P</option><option value="it">I</option>
+    </select>
+    <button class="printbtn" onclick="sendOrder()">✉ <span data-i18n="send">Elküld</span></button>
+    <button class="printbtn alt" onclick="printDoc()">🖨 <span data-i18n="pdf">PDF</span></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="inputs">
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-3a2 2 0 0 1 4 0v3"/></svg><span data-i18n="c_company">Cég</span></h2>
+        <label><span class="lab" data-i18n="company_name">Cég neve</span><input id="ceg" oninput="render()" data-i18n-ph="company_name" placeholder="Cég neve"></label>
+      </div>
+
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v9H2zM13 9h4l4 3.5V15h-8z"/><circle cx="6.5" cy="18" r="1.7"/><circle cx="17.5" cy="18" r="1.7"/></svg><span data-i18n="c_vehicle">Jármű (vontató)</span></h2>
+        <label><span class="lab" data-i18n="plate">Rendszám</span><input id="j_rsz" oninput="render()" data-i18n-ph="plate" placeholder="Rendszám"></label>
+        <label><span class="lab" data-i18n="axle_count">Tengelyek száma</span><input id="j_t" type="number" min="1" value="3" oninput="onAxle()"></label>
+        <p class="help" data-i18n="driven_hint">A hajtott tengelyt a vontató kerekére kattintva jelöld ki.</p>
+        <div id="jForgalmi" class="forgwrap"></div>
+      </div>
+
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="17" height="9"/><circle cx="8" cy="18" r="1.7"/><circle cx="14" cy="18" r="1.7"/><path d="M19 11h3"/></svg><span data-i18n="c_trailers">Pótkocsik</span></h2>
+        <div id="trailerList"></div>
+        <button class="addbtn" onclick="addTrailer()" data-i18n="add_trailer">+ Pótkocsi hozzáadása</button>
+      </div>
+
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="1"/><path d="M7 8v3M12 8v4M17 8v3"/></svg><span data-i18n="c_dims">Méretek</span></h2>
+        <div class="grid3">
+          <label><span class="lab" data-i18n="length">Hosszúság (m)</span><input id="m_h" inputmode="decimal" oninput="render()" placeholder="21"></label>
+          <label><span class="lab" data-i18n="width">Szélesség (m)</span><input id="m_sz" inputmode="decimal" oninput="render()" placeholder="3,19"></label>
+          <label><span class="lab" data-i18n="height">Magasság (m)</span><input id="m_m" inputmode="decimal" oninput="render()" placeholder="4,29"></label>
+        </div>
+        <label style="margin-top:12px"><span class="lab" data-i18n="gross">Össztömeg (t)</span><input id="ossz" inputmode="decimal" oninput="render()" placeholder="54"></label>
+      </div>
+
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><span data-i18n="c_route">Útvonal</span></h2>
+        <label><span class="lab" data-i18n="from">Honnan</span><input id="u_honnan" oninput="render()" data-i18n-ph="from" placeholder="Honnan"></label>
+        <label><span class="lab" data-i18n="to">Hová</span><input id="u_hova" oninput="render()" data-i18n-ph="to" placeholder="Hová"></label>
+        <label><span class="lab" data-i18n="goods">Áru</span><input id="u_aru" oninput="render()" data-i18n-ph="goods" placeholder="Áru"></label>
+      </div>
+
+      <div class="card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg><span data-i18n="c_datenote">Dátum &amp; megjegyzés</span></h2>
+        <label><span class="lab" data-i18n="datetime">Dátum, időpont</span><input id="datum" type="datetime-local" oninput="render()"></label>
+        <label><span class="lab" data-i18n="note">Megjegyzés</span><textarea id="megjegyzes" rows="4" oninput="render()" data-i18n-ph="note" placeholder="Megjegyzés"></textarea></label>
+        <label><span class="lab" data-i18n="copy_email">Másolat e-mail cím</span><input id="copy_to" type="email" inputmode="email" data-i18n-ph="copy_email" placeholder="Másolat e-mail cím"></label>
+      </div>
+
+      <div class="card full" id="tengelyekCard">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 12h6"/></svg><span data-i18n="c_axles">Tengelyek</span></h2>
+        <p class="axle-legend" data-i18n="axle_legend">Kör = tengely · fölötte a terhelés · közötte a távolság. Hajtott tengely: kattints a vontató kerekére.</p>
+        <button class="dia-toggle" onclick="toggleDia()" id="diaToggle" data-i18n="dia_show">▸ Tengelyábra megjelenítése</button>
+        <div id="axleDiagram"></div>
+        <div class="sub" data-i18n="sub_dist">Tengelytávolságok (m)</div>
+        <div class="ingrid" id="distGrid"></div>
+        <div class="sub" style="margin-top:14px" data-i18n="sub_load">Tengelyterhelések (t)</div>
+        <div class="ingrid" id="loadGrid"></div>
+      </div>
+
+      <div class="card full">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span data-i18n="c_send">Küldés</span></h2>
+        <button class="sendbtn" onclick="sendOrder()">✉ <span data-i18n="send_full">Megrendelés elküldése</span></button>
+        <p id="sendStatus" class="help" style="min-height:18px;margin-top:8px"></p>
+        <p class="help">Kattintásra automatikusan elküldi a megrendelést. <b>Egyszeri beállítás:</b> a web3forms.com oldalon a céges e-mail-címmel kérj egy ingyenes Access Key-t, és illeszd be a fájl tetején az <code>ACCESS_KEY</code> sorba. (Forgalmi fotó csatolásához Web3Forms PRO szükséges.)</p>
+      </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview">
+    <div class="ptitle" data-i18n="prev_hint">Előnézet — az értékek itt is szerkeszthetők · nyomtatható</div>
+    <div class="doc-scroll"><div id="doc"></div></div>
+  </div>
+
+</div>
+
+<script>
+  let dists = [];   // strings
+  let loads = [];
+  let driven = [];  // booleans (tractor only)
+  let trailers = []; // [{rsz, t, isNew, front, back}] — default one, more can be added
+  let tractor = {isNew:false, front:null, back:null}; // forgalmi photos for the tractor
+
+  // ===== i18n =====
+  const ALIAS={at:'de', be:'fr'};
+  let curLang='hu';
+  const T={
+    hu:{app_title:"Útvonalengedély bekérő",app_sub:"Egyszerű adatbevitel",send:"Elküld",pdf:"PDF",c_company:"Cég",c_vehicle:"Jármű (vontató)",c_trailers:"Pótkocsik",c_dims:"Méretek",c_route:"Útvonal",c_datenote:"Dátum & megjegyzés",c_axles:"Tengelyek",c_send:"Küldés",company_name:"Cég neve",plate:"Rendszám",axle_count:"Tengelyek száma",driven_hint:"A hajtott tengelyt a vontató kerekére kattintva jelöld ki.",length:"Hosszúság (m)",width:"Szélesség (m)",height:"Magasság (m)",gross:"Össztömeg (t)",from:"Honnan",to:"Hová",goods:"Áru",datetime:"Dátum, időpont",note:"Megjegyzés",copy_email:"Másolat e-mail cím",axle_legend:"Kör = tengely · fölötte a terhelés · közötte a távolság. Hajtott tengely: kattints a vontató kerekére.",sub_dist:"Tengelytávolságok (m)",sub_load:"Tengelyterhelések (t)",dia_show:"▸ Tengelyábra megjelenítése",dia_hide:"▾ Tengelyábra elrejtése",forg_check:"Nincs még regisztrálva (forgalmi engedély szükséges)",forg_both:"Forgalmi engedély mindkét oldala:",forg_front:"Elülső",forg_back:"Hátsó",forg_btn:"📷 Fotó / feltöltés",trailer:"Pótkocsi",del:"Törlés",add_trailer:"+ Pótkocsi hozzáadása",send_full:"Megrendelés elküldése",prev_hint:"Előnézet — itt is szerkeszthető · nyomtatható",st_sending:"Küldés folyamatban…",st_sent:"Elküldve ✓"},
+    en:{app_title:"Route permit request",app_sub:"Simple data entry",send:"Send",pdf:"PDF",c_company:"Company",c_vehicle:"Vehicle (tractor)",c_trailers:"Trailers",c_dims:"Dimensions",c_route:"Route",c_datenote:"Date & note",c_axles:"Axles",c_send:"Send",company_name:"Company name",plate:"Licence plate",axle_count:"Number of axles",driven_hint:"Mark the driven axle by tapping a tractor wheel.",length:"Length (m)",width:"Width (m)",height:"Height (m)",gross:"Gross weight (t)",from:"From",to:"To",goods:"Goods",datetime:"Date, time",note:"Note",copy_email:"Copy to e-mail address",axle_legend:"Circle = axle · load above · distance between. Driven axle: tap a tractor wheel.",sub_dist:"Axle distances (m)",sub_load:"Axle loads (t)",dia_show:"▸ Show axle diagram",dia_hide:"▾ Hide axle diagram",forg_check:"Not yet registered (vehicle registration needed)",forg_both:"Both sides of the registration certificate:",forg_front:"Front",forg_back:"Back",forg_btn:"📷 Photo / upload",trailer:"Trailer",del:"Delete",add_trailer:"+ Add trailer",send_full:"Send order",prev_hint:"Preview — editable here too · printable",st_sending:"Sending…",st_sent:"Sent ✓"},
+    de:{app_title:"Streckengenehmigung anfordern",app_sub:"Einfache Dateneingabe",send:"Senden",pdf:"PDF",c_company:"Firma",c_vehicle:"Fahrzeug (Zugmaschine)",c_trailers:"Anhänger",c_dims:"Maße",c_route:"Route",c_datenote:"Datum & Anmerkung",c_axles:"Achsen",c_send:"Senden",company_name:"Firmenname",plate:"Kennzeichen",axle_count:"Anzahl der Achsen",driven_hint:"Angetriebene Achse durch Tippen auf ein Zugmaschinen-Rad markieren.",length:"Länge (m)",width:"Breite (m)",height:"Höhe (m)",gross:"Gesamtgewicht (t)",from:"Von",to:"Nach",goods:"Ware",datetime:"Datum, Uhrzeit",note:"Anmerkung",copy_email:"Kopie an E-Mail-Adresse",axle_legend:"Kreis = Achse · Last darüber · Abstand dazwischen. Angetriebene Achse: Zugmaschinen-Rad antippen.",sub_dist:"Achsabstände (m)",sub_load:"Achslasten (t)",dia_show:"▸ Achsdiagramm anzeigen",dia_hide:"▾ Achsdiagramm ausblenden",forg_check:"Noch nicht registriert (Zulassung erforderlich)",forg_both:"Beide Seiten des Fahrzeugscheins:",forg_front:"Vorderseite",forg_back:"Rückseite",forg_btn:"📷 Foto / Hochladen",trailer:"Anhänger",del:"Löschen",add_trailer:"+ Anhänger hinzufügen",send_full:"Bestellung senden",prev_hint:"Vorschau — auch hier bearbeitbar · druckbar",st_sending:"Senden…",st_sent:"Gesendet ✓"},
+    ro:{app_title:"Cerere autorizație de traseu",app_sub:"Introducere simplă a datelor",send:"Trimite",pdf:"PDF",c_company:"Firmă",c_vehicle:"Vehicul (cap tractor)",c_trailers:"Remorci",c_dims:"Dimensiuni",c_route:"Traseu",c_datenote:"Dată & observație",c_axles:"Axe",c_send:"Trimite",company_name:"Numele firmei",plate:"Număr de înmatriculare",axle_count:"Număr de axe",driven_hint:"Marchează axa motoare atingând o roată a capului tractor.",length:"Lungime (m)",width:"Lățime (m)",height:"Înălțime (m)",gross:"Masă totală (t)",from:"De la",to:"Către",goods:"Marfă",datetime:"Data, ora",note:"Observație",copy_email:"Copie la adresa de e-mail",axle_legend:"Cerc = axă · sarcina deasupra · distanța între. Axa motoare: atinge o roată a tractorului.",sub_dist:"Distanțe între axe (m)",sub_load:"Sarcini pe axe (t)",dia_show:"▸ Arată diagrama axelor",dia_hide:"▾ Ascunde diagrama axelor",forg_check:"Neînregistrat încă (certificat de înmatriculare necesar)",forg_both:"Ambele fețe ale certificatului de înmatriculare:",forg_front:"Față",forg_back:"Spate",forg_btn:"📷 Foto / încărcare",trailer:"Remorcă",del:"Șterge",add_trailer:"+ Adaugă remorcă",send_full:"Trimite comanda",prev_hint:"Previzualizare — editabilă și aici · imprimabilă",st_sending:"Se trimite…",st_sent:"Trimis ✓"},
+    sk:{app_title:"Žiadosť o povolenie trasy",app_sub:"Jednoduché zadávanie údajov",send:"Odoslať",pdf:"PDF",c_company:"Firma",c_vehicle:"Vozidlo (ťahač)",c_trailers:"Prívesy",c_dims:"Rozmery",c_route:"Trasa",c_datenote:"Dátum & poznámka",c_axles:"Nápravy",c_send:"Odoslať",company_name:"Názov firmy",plate:"ŠPZ",axle_count:"Počet náprav",driven_hint:"Hnaciu nápravu označíš kliknutím na koleso ťahača.",length:"Dĺžka (m)",width:"Šírka (m)",height:"Výška (m)",gross:"Celková hmotnosť (t)",from:"Odkiaľ",to:"Kam",goods:"Tovar",datetime:"Dátum, čas",note:"Poznámka",copy_email:"Kópia na e-mailovú adresu",axle_legend:"Kruh = náprava · zaťaženie hore · vzdialenosť medzi. Hnacia náprava: klikni na koleso ťahača.",sub_dist:"Vzdialenosti náprav (m)",sub_load:"Zaťaženie náprav (t)",dia_show:"▸ Zobraziť schému náprav",dia_hide:"▾ Skryť schému náprav",forg_check:"Ešte neregistrované (potrebné osvedčenie o evidencii)",forg_both:"Obe strany osvedčenia o evidencii:",forg_front:"Predná strana",forg_back:"Zadná strana",forg_btn:"📷 Foto / nahrať",trailer:"Príves",del:"Vymazať",add_trailer:"+ Pridať príves",send_full:"Odoslať objednávku",prev_hint:"Náhľad — upraviteľné aj tu · tlačiteľné",st_sending:"Odosielanie…",st_sent:"Odoslané ✓"},
+    cs:{app_title:"Žádost o povolení trasy",app_sub:"Jednoduché zadávání údajů",send:"Odeslat",pdf:"PDF",c_company:"Firma",c_vehicle:"Vozidlo (tahač)",c_trailers:"Přívěsy",c_dims:"Rozměry",c_route:"Trasa",c_datenote:"Datum & poznámka",c_axles:"Nápravy",c_send:"Odeslat",company_name:"Název firmy",plate:"SPZ",axle_count:"Počet náprav",driven_hint:"Hnací nápravu označíš kliknutím na kolo tahače.",length:"Délka (m)",width:"Šířka (m)",height:"Výška (m)",gross:"Celková hmotnost (t)",from:"Odkud",to:"Kam",goods:"Zboží",datetime:"Datum, čas",note:"Poznámka",copy_email:"Kopie na e-mailovou adresu",axle_legend:"Kruh = náprava · zatížení nahoře · vzdálenost mezi. Hnací náprava: klikni na kolo tahače.",sub_dist:"Vzdálenosti náprav (m)",sub_load:"Zatížení náprav (t)",dia_show:"▸ Zobrazit schéma náprav",dia_hide:"▾ Skrýt schéma náprav",forg_check:"Dosud neregistrováno (nutný technický průkaz)",forg_both:"Obě strany technického průkazu:",forg_front:"Přední strana",forg_back:"Zadní strana",forg_btn:"📷 Foto / nahrát",trailer:"Přívěs",del:"Smazat",add_trailer:"+ Přidat přívěs",send_full:"Odeslat objednávku",prev_hint:"Náhled — upravitelné i zde · tisknutelné",st_sending:"Odesílání…",st_sent:"Odesláno ✓"},
+    pl:{app_title:"Wniosek o zezwolenie na trasę",app_sub:"Proste wprowadzanie danych",send:"Wyślij",pdf:"PDF",c_company:"Firma",c_vehicle:"Pojazd (ciągnik)",c_trailers:"Naczepy",c_dims:"Wymiary",c_route:"Trasa",c_datenote:"Data i uwaga",c_axles:"Osie",c_send:"Wyślij",company_name:"Nazwa firmy",plate:"Numer rejestracyjny",axle_count:"Liczba osi",driven_hint:"Oś napędową zaznacz, klikając koło ciągnika.",length:"Długość (m)",width:"Szerokość (m)",height:"Wysokość (m)",gross:"Masa całkowita (t)",from:"Skąd",to:"Dokąd",goods:"Towar",datetime:"Data, godzina",note:"Uwaga",copy_email:"Kopia na adres e-mail",axle_legend:"Koło = oś · obciążenie u góry · odległość pomiędzy. Oś napędowa: kliknij koło ciągnika.",sub_dist:"Odległości osi (m)",sub_load:"Obciążenia osi (t)",dia_show:"▸ Pokaż schemat osi",dia_hide:"▾ Ukryj schemat osi",forg_check:"Jeszcze niezarejestrowany (wymagany dowód rejestracyjny)",forg_both:"Obie strony dowodu rejestracyjnego:",forg_front:"Przód",forg_back:"Tył",forg_btn:"📷 Zdjęcie / prześlij",trailer:"Naczepa",del:"Usuń",add_trailer:"+ Dodaj naczepę",send_full:"Wyślij zamówienie",prev_hint:"Podgląd — można edytować tutaj · do druku",st_sending:"Wysyłanie…",st_sent:"Wysłano ✓"},
+    sl:{app_title:"Zahteva za dovoljenje za pot",app_sub:"Preprosto vnašanje podatkov",send:"Pošlji",pdf:"PDF",c_company:"Podjetje",c_vehicle:"Vozilo (vlačilec)",c_trailers:"Priklopniki",c_dims:"Mere",c_route:"Pot",c_datenote:"Datum in opomba",c_axles:"Osi",c_send:"Pošlji",company_name:"Ime podjetja",plate:"Registrska tablica",axle_count:"Število osi",driven_hint:"Pogonsko os označi s klikom na kolo vlačilca.",length:"Dolžina (m)",width:"Širina (m)",height:"Višina (m)",gross:"Skupna masa (t)",from:"Od",to:"Do",goods:"Blago",datetime:"Datum, ura",note:"Opomba",copy_email:"Kopija na e-poštni naslov",axle_legend:"Krog = os · obremenitev zgoraj · razdalja vmes. Pogonska os: klikni kolo vlačilca.",sub_dist:"Razdalje med osmi (m)",sub_load:"Obremenitve osi (t)",dia_show:"▸ Prikaži shemo osi",dia_hide:"▾ Skrij shemo osi",forg_check:"Še ni registrirano (potrebno prometno dovoljenje)",forg_both:"Obe strani prometnega dovoljenja:",forg_front:"Sprednja stran",forg_back:"Zadnja stran",forg_btn:"📷 Foto / naloži",trailer:"Priklopnik",del:"Izbriši",add_trailer:"+ Dodaj priklopnik",send_full:"Pošlji naročilo",prev_hint:"Predogled — urejanje tudi tukaj · za tisk",st_sending:"Pošiljanje…",st_sent:"Poslano ✓"},
+    uk:{app_title:"Заявка на дозвіл маршруту",app_sub:"Простий ввід даних",send:"Надіслати",pdf:"PDF",c_company:"Компанія",c_vehicle:"Транспорт (тягач)",c_trailers:"Причепи",c_dims:"Розміри",c_route:"Маршрут",c_datenote:"Дата і примітка",c_axles:"Осі",c_send:"Надіслати",company_name:"Назва компанії",plate:"Номерний знак",axle_count:"Кількість осей",driven_hint:"Позначте ведучу вісь, торкнувшись колеса тягача.",length:"Довжина (м)",width:"Ширина (м)",height:"Висота (м)",gross:"Повна маса (т)",from:"Звідки",to:"Куди",goods:"Вантаж",datetime:"Дата, час",note:"Примітка",copy_email:"Копія на e-mail адресу",axle_legend:"Коло = вісь · навантаження зверху · відстань між. Ведуча вісь: торкніться колеса тягача.",sub_dist:"Відстані між осями (м)",sub_load:"Навантаження на осі (т)",dia_show:"▸ Показати схему осей",dia_hide:"▾ Сховати схему осей",forg_check:"Ще не зареєстровано (потрібне свідоцтво про реєстрацію)",forg_both:"Обидві сторони свідоцтва про реєстрацію:",forg_front:"Лицьова сторона",forg_back:"Зворотна сторона",forg_btn:"📷 Фото / завантажити",trailer:"Причіп",del:"Видалити",add_trailer:"+ Додати причіп",send_full:"Надіслати замовлення",prev_hint:"Перегляд — можна редагувати тут · для друку",st_sending:"Надсилання…",st_sent:"Надіслано ✓"},
+    ru:{app_title:"Заявка на разрешение маршрута",app_sub:"Простой ввод данных",send:"Отправить",pdf:"PDF",c_company:"Компания",c_vehicle:"Транспорт (тягач)",c_trailers:"Прицепы",c_dims:"Размеры",c_route:"Маршрут",c_datenote:"Дата и примечание",c_axles:"Оси",c_send:"Отправить",company_name:"Название компании",plate:"Гос. номер",axle_count:"Количество осей",driven_hint:"Отметьте ведущую ось, нажав на колесо тягача.",length:"Длина (м)",width:"Ширина (м)",height:"Высота (м)",gross:"Полная масса (т)",from:"Откуда",to:"Куда",goods:"Груз",datetime:"Дата, время",note:"Примечание",copy_email:"Копия на e-mail адрес",axle_legend:"Круг = ось · нагрузка сверху · расстояние между. Ведущая ось: нажмите на колесо тягача.",sub_dist:"Расстояния между осями (м)",sub_load:"Нагрузки на оси (т)",dia_show:"▸ Показать схему осей",dia_hide:"▾ Скрыть схему осей",forg_check:"Ещё не зарегистрировано (нужно свидетельство о регистрации)",forg_both:"Обе стороны свидетельства о регистрации:",forg_front:"Лицевая сторона",forg_back:"Оборотная сторона",forg_btn:"📷 Фото / загрузить",trailer:"Прицеп",del:"Удалить",add_trailer:"+ Добавить прицеп",send_full:"Отправить заказ",prev_hint:"Предпросмотр — можно редактировать здесь · для печати",st_sending:"Отправка…",st_sent:"Отправлено ✓"},
+    lt:{app_title:"Maršruto leidimo užklausa",app_sub:"Paprastas duomenų įvedimas",send:"Siųsti",pdf:"PDF",c_company:"Įmonė",c_vehicle:"Transporto priemonė (vilkikas)",c_trailers:"Priekabos",c_dims:"Matmenys",c_route:"Maršrutas",c_datenote:"Data ir pastaba",c_axles:"Ašys",c_send:"Siųsti",company_name:"Įmonės pavadinimas",plate:"Valst. numeris",axle_count:"Ašių skaičius",driven_hint:"Pažymėkite varančiąją ašį spustelėdami vilkiko ratą.",length:"Ilgis (m)",width:"Plotis (m)",height:"Aukštis (m)",gross:"Bendra masė (t)",from:"Iš",to:"Į",goods:"Krovinys",datetime:"Data, laikas",note:"Pastaba",copy_email:"Kopija el. pašto adresu",axle_legend:"Apskritimas = ašis · apkrova viršuje · atstumas tarp. Varančioji ašis: spustelėkite vilkiko ratą.",sub_dist:"Atstumai tarp ašių (m)",sub_load:"Ašių apkrovos (t)",dia_show:"▸ Rodyti ašių schemą",dia_hide:"▾ Slėpti ašių schemą",forg_check:"Dar neregistruota (reikia registracijos liudijimo)",forg_both:"Abi registracijos liudijimo pusės:",forg_front:"Priekinė pusė",forg_back:"Galinė pusė",forg_btn:"📷 Nuotrauka / įkelti",trailer:"Priekaba",del:"Ištrinti",add_trailer:"+ Pridėti priekabą",send_full:"Siųsti užsakymą",prev_hint:"Peržiūra — galima redaguoti čia · spausdinti",st_sending:"Siunčiama…",st_sent:"Išsiųsta ✓"},
+    lv:{app_title:"Maršruta atļaujas pieprasījums",app_sub:"Vienkārša datu ievade",send:"Sūtīt",pdf:"PDF",c_company:"Uzņēmums",c_vehicle:"Transportlīdzeklis (vilcējs)",c_trailers:"Piekabes",c_dims:"Izmēri",c_route:"Maršruts",c_datenote:"Datums un piezīme",c_axles:"Asis",c_send:"Sūtīt",company_name:"Uzņēmuma nosaukums",plate:"Reģistrācijas numurs",axle_count:"Asu skaits",driven_hint:"Atzīmējiet dzenošo asi, pieskaroties vilcēja ritenim.",length:"Garums (m)",width:"Platums (m)",height:"Augstums (m)",gross:"Pilna masa (t)",from:"No",to:"Uz",goods:"Krava",datetime:"Datums, laiks",note:"Piezīme",copy_email:"Kopija uz e-pasta adresi",axle_legend:"Aplis = ass · slodze augšā · attālums starp. Dzenošā ass: pieskarieties vilcēja ritenim.",sub_dist:"Attālumi starp asīm (m)",sub_load:"Asu slodzes (t)",dia_show:"▸ Rādīt asu shēmu",dia_hide:"▾ Slēpt asu shēmu",forg_check:"Vēl nav reģistrēts (nepieciešama reģistrācijas apliecība)",forg_both:"Abas reģistrācijas apliecības puses:",forg_front:"Priekšpuse",forg_back:"Aizmugure",forg_btn:"📷 Foto / augšupielādēt",trailer:"Piekabe",del:"Dzēst",add_trailer:"+ Pievienot piekabi",send_full:"Sūtīt pasūtījumu",prev_hint:"Priekšskatījums — rediģējams arī šeit · drukājams",st_sending:"Sūta…",st_sent:"Nosūtīts ✓"},
+    hr:{app_title:"Zahtjev za dozvolu rute",app_sub:"Jednostavan unos podataka",send:"Pošalji",pdf:"PDF",c_company:"Tvrtka",c_vehicle:"Vozilo (tegljač)",c_trailers:"Prikolice",c_dims:"Dimenzije",c_route:"Ruta",c_datenote:"Datum i napomena",c_axles:"Osovine",c_send:"Pošalji",company_name:"Naziv tvrtke",plate:"Registarska oznaka",axle_count:"Broj osovina",driven_hint:"Označi pogonsku osovinu klikom na kotač tegljača.",length:"Dužina (m)",width:"Širina (m)",height:"Visina (m)",gross:"Ukupna masa (t)",from:"Odakle",to:"Kamo",goods:"Roba",datetime:"Datum, vrijeme",note:"Napomena",copy_email:"Kopija na e-mail adresu",axle_legend:"Krug = osovina · opterećenje iznad · razmak između. Pogonska osovina: klikni kotač tegljača.",sub_dist:"Razmaci osovina (m)",sub_load:"Opterećenja osovina (t)",dia_show:"▸ Prikaži shemu osovina",dia_hide:"▾ Sakrij shemu osovina",forg_check:"Još nije registrirano (potrebna prometna dozvola)",forg_both:"Obje strane prometne dozvole:",forg_front:"Prednja strana",forg_back:"Stražnja strana",forg_btn:"📷 Foto / učitaj",trailer:"Prikolica",del:"Izbriši",add_trailer:"+ Dodaj prikolicu",send_full:"Pošalji narudžbu",prev_hint:"Pregled — može se uređivati i ovdje · za ispis",st_sending:"Slanje…",st_sent:"Poslano ✓"},
+    bg:{app_title:"Заявка за разрешение за маршрут",app_sub:"Лесно въвеждане на данни",send:"Изпрати",pdf:"PDF",c_company:"Фирма",c_vehicle:"Превозно средство (влекач)",c_trailers:"Ремаркета",c_dims:"Размери",c_route:"Маршрут",c_datenote:"Дата и бележка",c_axles:"Оси",c_send:"Изпрати",company_name:"Име на фирмата",plate:"Регистрационен номер",axle_count:"Брой оси",driven_hint:"Маркирайте задвижващата ос, като докоснете колело на влекача.",length:"Дължина (м)",width:"Ширина (м)",height:"Височина (м)",gross:"Обща маса (т)",from:"Откъде",to:"Закъде",goods:"Товар",datetime:"Дата, час",note:"Бележка",copy_email:"Копие на имейл адрес",axle_legend:"Кръг = ос · товар отгоре · разстояние между. Задвижваща ос: докоснете колело на влекача.",sub_dist:"Разстояния между осите (м)",sub_load:"Натоварвания на осите (т)",dia_show:"▸ Покажи схемата на осите",dia_hide:"▾ Скрий схемата на осите",forg_check:"Все още нерегистрирано (нужно е свидетелство за регистрация)",forg_both:"Двете страни на свидетелството за регистрация:",forg_front:"Лицева страна",forg_back:"Гръб",forg_btn:"📷 Снимка / качване",trailer:"Ремарке",del:"Изтрий",add_trailer:"+ Добави ремарке",send_full:"Изпрати поръчката",prev_hint:"Преглед — може да се редактира и тук · за печат",st_sending:"Изпращане…",st_sent:"Изпратено ✓"},
+    nl:{app_title:"Aanvraag routevergunning",app_sub:"Eenvoudige invoer",send:"Verzenden",pdf:"PDF",c_company:"Bedrijf",c_vehicle:"Voertuig (trekker)",c_trailers:"Opleggers",c_dims:"Afmetingen",c_route:"Route",c_datenote:"Datum & opmerking",c_axles:"Assen",c_send:"Verzenden",company_name:"Bedrijfsnaam",plate:"Kenteken",axle_count:"Aantal assen",driven_hint:"Markeer de aangedreven as door op een trekkerwiel te tikken.",length:"Lengte (m)",width:"Breedte (m)",height:"Hoogte (m)",gross:"Totaalgewicht (t)",from:"Van",to:"Naar",goods:"Lading",datetime:"Datum, tijd",note:"Opmerking",copy_email:"Kopie naar e-mailadres",axle_legend:"Cirkel = as · belasting erboven · afstand ertussen. Aangedreven as: tik op een trekkerwiel.",sub_dist:"Asafstanden (m)",sub_load:"Asbelastingen (t)",dia_show:"▸ Asdiagram tonen",dia_hide:"▾ Asdiagram verbergen",forg_check:"Nog niet geregistreerd (kentekenbewijs vereist)",forg_both:"Beide zijden van het kentekenbewijs:",forg_front:"Voorkant",forg_back:"Achterkant",forg_btn:"📷 Foto / uploaden",trailer:"Oplegger",del:"Verwijderen",add_trailer:"+ Oplegger toevoegen",send_full:"Bestelling verzenden",prev_hint:"Voorbeeld — ook hier bewerkbaar · afdrukbaar",st_sending:"Verzenden…",st_sent:"Verzonden ✓"},
+    sv:{app_title:"Ansökan om ruttillstånd",app_sub:"Enkel datainmatning",send:"Skicka",pdf:"PDF",c_company:"Företag",c_vehicle:"Fordon (dragbil)",c_trailers:"Släp",c_dims:"Mått",c_route:"Rutt",c_datenote:"Datum & anteckning",c_axles:"Axlar",c_send:"Skicka",company_name:"Företagsnamn",plate:"Registreringsnummer",axle_count:"Antal axlar",driven_hint:"Markera drivaxeln genom att trycka på ett dragbilshjul.",length:"Längd (m)",width:"Bredd (m)",height:"Höjd (m)",gross:"Totalvikt (t)",from:"Från",to:"Till",goods:"Gods",datetime:"Datum, tid",note:"Anteckning",copy_email:"Kopia till e-postadress",axle_legend:"Cirkel = axel · last ovanför · avstånd emellan. Drivaxel: tryck på ett dragbilshjul.",sub_dist:"Axelavstånd (m)",sub_load:"Axellaster (t)",dia_show:"▸ Visa axeldiagram",dia_hide:"▾ Dölj axeldiagram",forg_check:"Ännu inte registrerad (registreringsbevis krävs)",forg_both:"Registreringsbevisets båda sidor:",forg_front:"Framsida",forg_back:"Baksida",forg_btn:"📷 Foto / ladda upp",trailer:"Släp",del:"Ta bort",add_trailer:"+ Lägg till släp",send_full:"Skicka beställning",prev_hint:"Förhandsvisning — redigerbar även här · utskrivbar",st_sending:"Skickar…",st_sent:"Skickat ✓"},
+    fr:{app_title:"Demande d'autorisation d'itinéraire",app_sub:"Saisie simple des données",send:"Envoyer",pdf:"PDF",c_company:"Société",c_vehicle:"Véhicule (tracteur)",c_trailers:"Remorques",c_dims:"Dimensions",c_route:"Itinéraire",c_datenote:"Date et remarque",c_axles:"Essieux",c_send:"Envoyer",company_name:"Nom de la société",plate:"Plaque d'immatriculation",axle_count:"Nombre d'essieux",driven_hint:"Marquez l'essieu moteur en touchant une roue du tracteur.",length:"Longueur (m)",width:"Largeur (m)",height:"Hauteur (m)",gross:"Masse totale (t)",from:"De",to:"À",goods:"Marchandise",datetime:"Date, heure",note:"Remarque",copy_email:"Copie à l'adresse e-mail",axle_legend:"Cercle = essieu · charge au-dessus · distance entre. Essieu moteur : touchez une roue du tracteur.",sub_dist:"Distances entre essieux (m)",sub_load:"Charges par essieu (t)",dia_show:"▸ Afficher le schéma des essieux",dia_hide:"▾ Masquer le schéma des essieux",forg_check:"Pas encore enregistré (carte grise requise)",forg_both:"Les deux faces de la carte grise :",forg_front:"Recto",forg_back:"Verso",forg_btn:"📷 Photo / téléverser",trailer:"Remorque",del:"Supprimer",add_trailer:"+ Ajouter une remorque",send_full:"Envoyer la commande",prev_hint:"Aperçu — modifiable ici aussi · imprimable",st_sending:"Envoi…",st_sent:"Envoyé ✓"},
+    es:{app_title:"Solicitud de permiso de ruta",app_sub:"Entrada de datos sencilla",send:"Enviar",pdf:"PDF",c_company:"Empresa",c_vehicle:"Vehículo (cabeza tractora)",c_trailers:"Remolques",c_dims:"Dimensiones",c_route:"Ruta",c_datenote:"Fecha y nota",c_axles:"Ejes",c_send:"Enviar",company_name:"Nombre de la empresa",plate:"Matrícula",axle_count:"Número de ejes",driven_hint:"Marca el eje motriz tocando una rueda de la tractora.",length:"Longitud (m)",width:"Anchura (m)",height:"Altura (m)",gross:"Masa total (t)",from:"Desde",to:"Hasta",goods:"Mercancía",datetime:"Fecha, hora",note:"Nota",copy_email:"Copia al correo electrónico",axle_legend:"Círculo = eje · carga arriba · distancia entre. Eje motriz: toca una rueda de la tractora.",sub_dist:"Distancias entre ejes (m)",sub_load:"Cargas por eje (t)",dia_show:"▸ Mostrar diagrama de ejes",dia_hide:"▾ Ocultar diagrama de ejes",forg_check:"Aún no registrado (permiso de circulación necesario)",forg_both:"Ambas caras del permiso de circulación:",forg_front:"Anverso",forg_back:"Reverso",forg_btn:"📷 Foto / subir",trailer:"Remolque",del:"Eliminar",add_trailer:"+ Añadir remolque",send_full:"Enviar pedido",prev_hint:"Vista previa — editable aquí también · imprimible",st_sending:"Enviando…",st_sent:"Enviado ✓"},
+    pt:{app_title:"Pedido de autorização de rota",app_sub:"Introdução simples de dados",send:"Enviar",pdf:"PDF",c_company:"Empresa",c_vehicle:"Veículo (trator)",c_trailers:"Semirreboques",c_dims:"Dimensões",c_route:"Rota",c_datenote:"Data e nota",c_axles:"Eixos",c_send:"Enviar",company_name:"Nome da empresa",plate:"Matrícula",axle_count:"Número de eixos",driven_hint:"Marque o eixo motriz tocando numa roda do trator.",length:"Comprimento (m)",width:"Largura (m)",height:"Altura (m)",gross:"Massa total (t)",from:"De",to:"Para",goods:"Mercadoria",datetime:"Data, hora",note:"Nota",copy_email:"Cópia para o e-mail",axle_legend:"Círculo = eixo · carga acima · distância entre. Eixo motriz: toque numa roda do trator.",sub_dist:"Distâncias entre eixos (m)",sub_load:"Cargas por eixo (t)",dia_show:"▸ Mostrar diagrama de eixos",dia_hide:"▾ Ocultar diagrama de eixos",forg_check:"Ainda não registado (documento do veículo necessário)",forg_both:"Ambos os lados do documento do veículo:",forg_front:"Frente",forg_back:"Verso",forg_btn:"📷 Foto / carregar",trailer:"Semirreboque",del:"Eliminar",add_trailer:"+ Adicionar semirreboque",send_full:"Enviar encomenda",prev_hint:"Pré-visualização — editável aqui também · imprimível",st_sending:"A enviar…",st_sent:"Enviado ✓"},
+    it:{app_title:"Richiesta autorizzazione percorso",app_sub:"Inserimento dati semplice",send:"Invia",pdf:"PDF",c_company:"Azienda",c_vehicle:"Veicolo (trattore)",c_trailers:"Rimorchi",c_dims:"Dimensioni",c_route:"Percorso",c_datenote:"Data e nota",c_axles:"Assi",c_send:"Invia",company_name:"Nome azienda",plate:"Targa",axle_count:"Numero di assi",driven_hint:"Segna l'asse motore toccando una ruota del trattore.",length:"Lunghezza (m)",width:"Larghezza (m)",height:"Altezza (m)",gross:"Massa totale (t)",from:"Da",to:"A",goods:"Merce",datetime:"Data, ora",note:"Nota",copy_email:"Copia all'indirizzo e-mail",axle_legend:"Cerchio = asse · carico sopra · distanza tra. Asse motore: tocca una ruota del trattore.",sub_dist:"Distanze tra gli assi (m)",sub_load:"Carichi sugli assi (t)",dia_show:"▸ Mostra schema assi",dia_hide:"▾ Nascondi schema assi",forg_check:"Non ancora registrato (libretto di circolazione necessario)",forg_both:"Entrambi i lati del libretto di circolazione:",forg_front:"Fronte",forg_back:"Retro",forg_btn:"📷 Foto / carica",trailer:"Rimorchio",del:"Elimina",add_trailer:"+ Aggiungi rimorchio",send_full:"Invia ordine",prev_hint:"Anteprima — modificabile anche qui · stampabile",st_sending:"Invio…",st_sent:"Inviato ✓"}
+  };
+  function dict(){ return T[ALIAS[curLang]||curLang] || T.en; }
+  function t(k){ const d=dict(); return (d&&d[k]!=null)? d[k] : (T.en[k]||k); }
+  function applyLang(code){
+    curLang=code||'hu';
+    document.documentElement.lang = (ALIAS[curLang]||curLang);
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+    buildTrailers(); renderForg('j'); buildAxleInputs(); buildDiagram(); render();
+    const b=document.getElementById('diaToggle'), d=document.getElementById('axleDiagram');
+    if(b&&d) b.textContent = d.classList.contains('show') ? t('dia_hide') : t('dia_show');
+  }
+
+  const example = {
+    ceg:'', j_rsz:'', j_t:2,
+    trailers:[{rsz:'', t:2}],
+    m_h:'', m_sz:'', m_m:'',
+    u_honnan:'', u_hova:'', u_aru:'',
+    datum:'', ossz:'', megjegyzes:'',
+    dists:[], loads:[], driven:[]
+  };
+
+  const val = id => document.getElementById(id).value;
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const num = id => parseInt(val(id))||0;
+  const totalAxles = () => num('j_t')+trailers.reduce((s,t)=>s+(parseInt(t.t)||0),0);
+  function unitStarts(){ const set=new Set(); let acc=num('j_t'); trailers.forEach(t=>{ set.add(acc); acc+=(parseInt(t.t)||0); }); return set; }
+  function fmtDate(v){ if(!v) return ''; const p=v.split('T'); const d=p[0].split('-'); let s=d.length===3?d[0]+'.'+d[1]+'.'+d[2]+'.':p[0]; if(p[1]) s+=' '+p[1].slice(0,5); return s; }
+  const withUnit = (v,u) => { v=(v||'').trim(); if(!v) return ''; return /[a-zA-Z]/.test(v)? v : v+' '+u; };
+
+  // ---- axle data ----
+  function drivenCount(){ const jt=num('j_t'); return driven.slice(0,jt).filter(Boolean).length; }
+  function toggleDriven(i){ if(i>=num('j_t')) return; driven[i]=!driven[i]; buildDiagram(); render(); }
+  function resizeArrays(){
+    const tt=totalAxles(), nDist=Math.max(0,tt-1);
+    while(dists.length<nDist)dists.push(''); if(dists.length>nDist)dists.length=nDist;
+    while(loads.length<tt)loads.push(''); if(loads.length>tt)loads.length=tt;
+    while(driven.length<tt)driven.push(false); if(driven.length>tt)driven.length=tt;
+  }
+  function buildAxleInputs(){
+    resizeArrays();
+    const tt=totalAxles(), nDist=Math.max(0,tt-1);
+    const dg=document.getElementById('distGrid'); dg.innerHTML='';
+    for(let i=0;i<nDist;i++){ const c=document.createElement('div'); c.className='incell';
+      c.innerHTML=`<span class="lab">${i+1}.–${i+2}.</span><input value="${esc(dists[i])}" oninput="dists[${i}]=this.value;buildDiagram();render()" placeholder="m">`;
+      dg.appendChild(c); }
+    const lg=document.getElementById('loadGrid'); lg.innerHTML='';
+    for(let i=0;i<tt;i++){ const c=document.createElement('div'); c.className='incell';
+      c.innerHTML=`<span class="lab">${i+1}.</span><input value="${esc(loads[i])}" oninput="loads[${i}]=this.value;buildDiagram();render()" placeholder="t">`;
+      lg.appendChild(c); }
+  }
+  function buildDiagram(){
+    resizeArrays();
+    const tt=totalAxles(), jt=num('j_t'), starts=unitStarts();
+    const box=document.getElementById('axleDiagram'); box.innerHTML='';
+    const row=document.createElement('div'); row.className='dia-row';
+    for(let i=0;i<tt;i++){
+      const isTr=i<jt, dr=isTr && !!driven[i];
+      const ax=document.createElement('div'); ax.className='dia-axle';
+      ax.innerHTML=`<div class="dia-load">${withUnit(loads[i],'t')||'·'}</div>`+
+        `<div class="dia-wheel ${dr?'driven':''} ${isTr?'':'trailer'}" ${isTr?`onclick="toggleDriven(${i})" style="cursor:pointer"`:''}>${i+1}${dr?'<span class="hb">H</span>':''}</div>`;
+      row.appendChild(ax);
+      if(i<tt-1){ const gp=document.createElement('div'); gp.className='dia-gap';
+        const dm=parseFloat((dists[i]||'').toString().replace(',','.'));
+        const gw=(isFinite(dm)&&dm>0)? Math.min(300, Math.max(46, dm*26)) : 58;
+        gp.style.width=gw+'px';
+        const coupling = starts.has(i+1) ? ' coupling' : '';
+        gp.innerHTML=`<div class="dia-dist">${dists[i]?esc(dists[i])+' m':'·'}</div><div class="dia-dim${coupling}"></div>`;
+        row.appendChild(gp); }
+    }
+    box.appendChild(row);
+    fitDiagram();
+  }
+  function fitDiagram(){ const box=document.getElementById('axleDiagram'); if(!box||!box.firstChild) return; const row=box.firstChild; row.style.transform='none'; const nat=row.offsetWidth, avail=box.clientWidth; const sc=(avail>0&&nat>avail)? avail/nat : 1; row.style.transform='scale('+sc+')'; row.style.transformOrigin='top left'; box.style.height=Math.ceil(row.offsetHeight*sc)+'px'; }
+  window.addEventListener('resize', fitDiagram);
+  function onAxle(){ buildAxleInputs(); buildDiagram(); render(); }
+
+  // ---- forgalmi engedély (per vehicle) ----
+  function stateByKey(key){ return key==='j' ? tractor : trailers[parseInt(key.slice(1))]; }
+  function forgBlock(key, st){
+    const fid=s=>`forg_${key}_${s}`, pid=s=>`fprev_${key}_${s}`;
+    const prev=s=> (st[s]&&st[s].url)
+      ? `<img id="${pid(s)}" class="thumb" src="${st[s].url}" alt="">`
+      : `<img id="${pid(s)}" class="thumb" style="display:none" alt="">`;
+    return `<label class="chk"><input type="checkbox" ${st.isNew?'checked':''} onchange="toggleForg('${key}',this.checked)"> ${t('forg_check')}</label>`+
+      `<div class="forgbox" style="${st.isNew?'':'display:none'}">`+
+        `<p class="help" style="margin:9px 0 8px">${t('forg_both')}</p>`+
+        `<div class="grid2">`+
+          `<div class="upload"><span class="lab">${t('forg_front')}</span>`+
+            `<input type="file" accept="image/*" capture="environment" id="${fid('front')}" onchange="onPhoto('${key}','front')" hidden>`+
+            `<button class="upbtn" onclick="document.getElementById('${fid('front')}').click()">${t('forg_btn')}</button>${prev('front')}</div>`+
+          `<div class="upload"><span class="lab">${t('forg_back')}</span>`+
+            `<input type="file" accept="image/*" capture="environment" id="${fid('back')}" onchange="onPhoto('${key}','back')" hidden>`+
+            `<button class="upbtn" onclick="document.getElementById('${fid('back')}').click()">${t('forg_btn')}</button>${prev('back')}</div>`+
+        `</div></div>`;
+  }
+  function renderForg(key){
+    const c = key==='j' ? document.getElementById('jForgalmi') : document.getElementById('tforgwrap_'+key.slice(1));
+    if(c) c.innerHTML = forgBlock(key, stateByKey(key));
+  }
+  function toggleForg(key, checked){ stateByKey(key).isNew=checked; renderForg(key); render(); }
+  function onPhoto(key, side){
+    const st=stateByKey(key); const inp=document.getElementById(`forg_${key}_${side}`);
+    const f=inp.files&&inp.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ st[side]={file:f, url:r.result}; const img=document.getElementById(`fprev_${key}_${side}`); if(img){ img.src=r.result; img.style.display='block'; } render(); };
+    r.readAsDataURL(f);
+  }
+  function photoList(){
+    const out=[]; const add=(st,label)=>['front','back'].forEach(s=>{ if(st[s]&&st[s].file) out.push({file:st[s].file, url:st[s].url, label:label+' – '+(s==='front'?'elülső':'hátsó')}); });
+    if(tractor.isNew) add(tractor, 'Vontató'+(val('j_rsz')?(' '+val('j_rsz')):''));
+    trailers.forEach((t,k)=>{ if(t.isNew) add(t, 'Pótkocsi '+(k+1)+(t.rsz?(' '+t.rsz):'')); });
+    return out;
+  }
+
+  // ---- trailers (dynamic, default one) ----
+  function buildTrailers(){
+    const box=document.getElementById('trailerList'); box.innerHTML='';
+    trailers.forEach((tr,k)=>{
+      const d=document.createElement('div'); d.className='trailer-row';
+      d.innerHTML=`<div class="trailer-head"><span>${t('trailer')} ${k+1}</span><button class="delbtn" title="${t('del')}" onclick="removeTrailer(${k})">×</button></div>`+
+        `<label><span class="lab">${t('plate')}</span><input value="${esc(tr.rsz)}" oninput="trailers[${k}].rsz=this.value;render()" placeholder="${t('plate')}"></label>`+
+        `<label><span class="lab">${t('axle_count')}</span><input type="number" min="0" value="${esc(String(tr.t))}" oninput="trailers[${k}].t=this.value;onAxle()"></label>`+
+        `<div id="tforgwrap_${k}" class="forgwrap">${forgBlock('t'+k, tr)}</div>`;
+      box.appendChild(d);
+    });
+  }
+  function addTrailer(){ trailers.push({rsz:'', t:2, isNew:false, front:null, back:null}); buildTrailers(); onAxle(); }
+  function removeTrailer(k){ trailers.splice(k,1); buildTrailers(); onAxle(); }
+
+  function render(){
+    const distRows = dists.length? dists.map((d,i)=>`<tr><td class="n">${i+1}.–${i+2}.</td><td class="v"><span class="ce" contenteditable="true" data-dist="${i}">${esc(d)}</span> m</td></tr>`).join('') : `<tr><td class="n">&nbsp;</td><td class="v">&nbsp;</td></tr>`;
+    const loadRows = loads.length? loads.map((l,i)=>`<tr><td class="n">${i+1}. tengely</td><td class="v"><span class="ce" contenteditable="true" data-load="${i}">${esc(l)}</span> t</td></tr>`).join('') : `<tr><td class="n">&nbsp;</td><td class="v">&nbsp;</td></tr>`;
+    const pl=photoList();
+    const forgHtml = pl.length? `<div class="doc-forg">${pl.map(p=>`<figure><figcaption>${esc(p.label)}</figcaption><img src="${p.url}"></figure>`).join('')}</div>` : '';
+    document.getElementById('doc').innerHTML=`
+      <div class="d-title">Útvonalengedély</div>
+      <table class="d">
+        <colgroup><col style="width:22%"><col style="width:26%"><col style="width:26%"><col style="width:26%"></colgroup>
+        <tr><td class="lgl">Cég:</td><td class="company" colspan="3" contenteditable="true" data-field="ceg">${esc(val('ceg'))||'&nbsp;'}</td></tr>
+        <tr class="sp"><td colspan="4"></td></tr>
+        <tr><td style="border:none"></td><td class="lg">Rendszám:</td><td class="lg">Tengelyek száma:</td><td class="lg">Hajtott tengelyek:</td></tr>
+        <tr><td class="lgl">Jármű:</td><td class="big" contenteditable="true" data-field="j_rsz">${esc(val('j_rsz'))||'&nbsp;'}</td><td class="big">${esc(val('j_t'))||'&nbsp;'}</td><td class="big">${drivenCount()}</td></tr>
+        ${trailers.map((t,k)=>`<tr><td class="lgl">Pótkocsi${trailers.length>1?(' '+(k+1)):''}:</td><td class="big" contenteditable="true" data-trailer="${k}">${esc(t.rsz)||'&nbsp;'}</td><td class="big">${esc(String(t.t))||'&nbsp;'}</td><td class="big">0</td></tr>`).join('')}
+        <tr class="sp"><td colspan="4"></td></tr>
+        <tr><td class="lgl" rowspan="2" style="vertical-align:middle">Méretek:</td><td class="lg">Hosszúság:</td><td class="lg">Szélesség:</td><td class="lg">Magasság:</td></tr>
+        <tr><td class="big"><span class="ce" contenteditable="true" data-field="m_h">${esc(val('m_h'))}</span> m</td><td class="big"><span class="ce" contenteditable="true" data-field="m_sz">${esc(val('m_sz'))}</span> m</td><td class="big"><span class="ce" contenteditable="true" data-field="m_m">${esc(val('m_m'))}</span> m</td></tr>
+        <tr class="sp"><td colspan="4"></td></tr>
+        <tr><td class="lgl" rowspan="2" style="vertical-align:middle">Útvonal:</td><td class="lg">Honnan:</td><td class="lg">Hová:</td><td class="lg">Áru:</td></tr>
+        <tr><td class="data ctr" contenteditable="true" data-field="u_honnan">${esc(val('u_honnan'))||'&nbsp;'}</td><td class="data ctr" contenteditable="true" data-field="u_hova">${esc(val('u_hova'))||'&nbsp;'}</td><td class="data ctr" contenteditable="true" data-field="u_aru">${esc(val('u_aru'))||'&nbsp;'}</td></tr>
+        <tr class="sp"><td colspan="4"></td></tr>
+        <tr><td class="lgl">Megjegyzés:</td><td class="data" colspan="3" contenteditable="true" data-field="megjegyzes">${esc(val('megjegyzes'))||'&nbsp;'}</td></tr>
+      </table>
+      <div class="split">
+        <div style="border-right:2.5px solid var(--line)"><table class="at"><tr><td class="h" colspan="2">Tengelyek közötti távolságok</td></tr>${distRows}</table></div>
+        <div><table class="at">
+          <tr><td class="h">Dátum</td><td class="h">Össztömeg (t)</td></tr>
+          <tr><td class="v" style="width:auto">${esc(fmtDate(val('datum')))||'&nbsp;'}</td><td class="v" style="width:auto"><span class="ce" contenteditable="true" data-field="ossz">${esc(val('ossz'))}</span> t</td></tr>
+          <tr><td class="h" colspan="2">Tengelyterhelések</td></tr>${loadRows}
+        </table></div>
+      </div>${forgHtml}`;
+  }
+
+  function setAll(o){
+    ['ceg','j_rsz','j_t','m_h','m_sz','m_m','u_honnan','u_hova','u_aru','datum','ossz','megjegyzes']
+      .forEach(k=>document.getElementById(k).value=o[k]!=null?o[k]:'');
+    dists=(o.dists||[]).slice(); loads=(o.loads||[]).slice(); driven=(o.driven||[]).slice();
+    trailers=(o.trailers||[]).map(t=>({rsz:t.rsz||'', t:t.t!=null?t.t:0, isNew:false, front:null, back:null}));
+    tractor={isNew:false, front:null, back:null};
+    buildTrailers(); renderForg('j'); buildAxleInputs(); buildDiagram(); render();
+  }
+  function loadExample(){ setAll(example); }
+
+  // mobile: show axle diagram only on demand
+  function toggleDia(){
+    const d=document.getElementById('axleDiagram'), b=document.getElementById('diaToggle');
+    const show=!d.classList.contains('show');
+    d.classList.toggle('show', show);
+    b.textContent = show ? t('dia_hide') : t('dia_show');
+    if(show) setTimeout(fitDiagram, 30);
+  }
+
+  // build a plain-text order summary for e-mail
+  function buildOrderText(){
+    const L=[];
+    L.push('ÚTVONALENGEDÉLY MEGRENDELÉS'); L.push('');
+    L.push('Cég: '+val('ceg'));
+    L.push('Jármű (vontató): '+val('j_rsz')+' — '+val('j_t')+' tengely, hajtott: '+drivenCount());
+    trailers.forEach((t,k)=>L.push('Pótkocsi '+(k+1)+': '+(t.rsz||'')+' — '+(t.t||0)+' tengely'));
+    L.push('');
+    L.push('Méretek: hossz '+val('m_h')+' m, szél '+val('m_sz')+' m, mag '+val('m_m')+' m');
+    L.push('Össztömeg: '+val('ossz')+' t'); L.push('');
+    L.push('Honnan: '+val('u_honnan'));
+    L.push('Hová: '+val('u_hova'));
+    L.push('Áru: '+val('u_aru'));
+    L.push('Dátum, időpont: '+fmtDate(val('datum'))); L.push('');
+    L.push('Tengelytávolságok (m): '+dists.filter(x=>x).join(' / '));
+    L.push('Tengelyterhelések (t): '+loads.filter(x=>x).join(' / '));
+    if(val('megjegyzes')){ L.push(''); L.push('Megjegyzés: '+val('megjegyzes')); }
+    const _cc=(document.getElementById('copy_to')&&document.getElementById('copy_to').value||'').trim();
+    if(_cc){ L.push(''); L.push('Másolat kérve erre a címre: '+_cc); }
+    return L.join('\n');
+  }
+  // print only the permit document, isolated in a new window (reliable PDF)
+  function printDoc(){
+    const css = document.querySelector('style').innerHTML;
+    const docHtml = document.getElementById('doc').outerHTML;
+    const w = window.open('', '_blank');
+    if(!w){ window.print(); return; }
+    w.document.open();
+    w.document.write('<!DOCTYPE html><html lang="hu"><head><meta charset="utf-8"><title>Útvonalengedély</title><style>'+css+'</style>'+
+      '<style>*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{background:#fff;margin:0;padding:16px;}#doc{max-width:760px;margin:0 auto;box-shadow:none;}@page{size:A4 portrait;margin:12mm;}</style>'+
+      '</head><body>'+docHtml+'</body></html>');
+    w.document.close(); w.focus();
+    setTimeout(()=>{ try{ w.print(); }catch(e){} }, 500);
+  }
+
+  // === Automatikus e-mail küldés (Web3Forms) ===
+  // EGYSZERI BEÁLLÍTÁS: a https://web3forms.com oldalon a céges Gmail-címmel
+  // igényelj egy INGYENES Access Key-t, és illeszd be ide az alábbi sorba.
+  // (A kulcs nyilvános, biztonságos a fájlban tartani; az e-mail-cím nem látszik sehol.)
+  const ACCESS_KEY = 'IDE_ILLESZD_A_WEB3FORMS_ACCESS_KEY_T';
+
+  function setStatus(msg, ok){
+    const s=document.getElementById('sendStatus');
+    if(s){ s.textContent=msg; s.style.color = ok===true ? '#2e7d46' : (ok===false ? '#c0563f' : 'var(--muted)'); }
+  }
+
+  async function sendOrder(){
+    if(!ACCESS_KEY || ACCESS_KEY.indexOf('IDE_ILLESZD')===0){
+      setStatus('Beállítás szükséges: illeszd be az Access Key-t a fájl tetején (web3forms.com).', false);
+      return;
+    }
+    const subj='Útvonalengedély megrendelés'+(val('ceg')?(' – '+val('ceg')):'')+(val('datum')?(' – '+fmtDate(val('datum'))):'');
+    const cc=(document.getElementById('copy_to').value||'').trim();
+    const fd=new FormData();
+    fd.append('access_key', ACCESS_KEY);
+    fd.append('subject', subj);
+    fd.append('from_name', val('ceg')||'Útvonalengedély bekérő');
+    fd.append('message', buildOrderText());
+    if(cc) fd.append('cc', cc);
+    const photos=photoList();
+    photos.forEach((p,i)=> fd.append('attachment', p.file, ((p.label||('forgalmi_'+i)).replace(/[^\w]+/g,'_'))+'.jpg'));
+    setStatus(t('st_sending'));
+    try{
+      const res=await fetch('https://api.web3forms.com/submit',{method:'POST',body:fd});
+      const j=await res.json().catch(()=>({}));
+      if(res.ok && j.success){
+        setStatus(t('st_sent')+(photos.length?' (fotókkal)':''), true);
+      } else {
+        let m=(j&&j.message)?j.message:('HTTP '+res.status);
+        if(photos.length && /attach|pro|plan|file/i.test(m)) m='A fotók csatolásához Web3Forms PRO szükséges. A megrendelés szövege küldhető fotó nélkül.';
+        setStatus('Sikertelen küldés: '+m, false);
+      }
+    }catch(e){
+      setStatus('Hálózati hiba: '+(e&&e.message?e.message:e), false);
+    }
+  }
+
+  loadExample();
+  applyLang((document.getElementById('lang')||{}).value || 'hu');
+  window.addEventListener('load', fitDiagram);
+  setTimeout(fitDiagram, 250);
+
+  // two-way editing: edit values directly in the preview document
+  document.getElementById('doc').addEventListener('input', e=>{
+    const c=e.target, ds=c.dataset||{};
+    const txt=(c.innerText||'').replace(/\u00a0/g,' ').trim();
+    if(ds.field){ const el=document.getElementById(ds.field); if(el) el.value=txt; }
+    else if(ds.trailer!=null){ if(trailers[+ds.trailer]){ trailers[+ds.trailer].rsz=txt; buildTrailers(); } }
+    else if(ds.dist!=null){ dists[+ds.dist]=txt; buildAxleInputs(); buildDiagram(); }
+    else if(ds.load!=null){ loads[+ds.load]=txt; buildAxleInputs(); buildDiagram(); }
+  });
+</script>
+</body>
+</html>
