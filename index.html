@@ -15,6 +15,19 @@
   .langsel{flex:0 0 auto;font-family:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:9px;padding:9px 8px;background:#fff;color:var(--txt);cursor:pointer;}
   .savedsel{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--txt);font-family:inherit;font-size:16px;font-weight:600;padding:10px 12px;border-radius:10px;outline:none;cursor:pointer;}
   .savedsel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,154,31,.16);}
+  .authbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:16px;}
+  .authinfo{font-size:13.5px;font-weight:600;color:var(--txt);}
+  .authinfo b{color:var(--accent);}
+  .authbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  .minibtn{font-family:inherit;font-weight:700;font-size:13px;border:1.5px solid var(--gold);background:var(--gold);color:#fff;padding:9px 14px;border-radius:9px;cursor:pointer;}
+  .minibtn.alt{background:#fff;color:var(--accent);}
+  .minibtn:active{transform:translateY(1px);}
+  .modal{position:fixed;inset:0;background:rgba(20,25,35,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .modal-box{background:#fff;border-radius:16px;padding:22px 20px;width:100%;max-width:420px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto;}
+  .modal-box h3{font-family:'Saira Condensed';text-transform:uppercase;font-size:20px;letter-spacing:.5px;color:var(--accent);margin-bottom:14px;}
+  .modal-x{position:absolute;top:12px;right:14px;background:none;border:none;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;}
+  .modal-link{font-size:13px;color:var(--accent);cursor:pointer;text-decoration:underline;margin-top:12px;display:inline-block;}
+  .codebox{font-family:'Saira Condensed';font-weight:700;font-size:26px;letter-spacing:2px;color:var(--ink);background:var(--gold-soft);border-radius:10px;padding:12px;text-align:center;margin:10px 0;user-select:all;}
   .brand{display:flex;align-items:center;gap:10px;min-width:0;}
   .brand-mark{width:34px;height:34px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,var(--gold),#9c7212);display:grid;place-items:center;color:#fff;font-weight:700;font-family:'Saira Condensed';font-size:20px;}
   .brand h1{font-family:'Saira Condensed';font-weight:700;font-size:17px;letter-spacing:.3px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -158,8 +171,16 @@
 </div>
 
 <div class="wrap">
+  <div class="authbar" id="authBar">
+    <span class="authinfo" id="authInfo" data-i18n="auth_anon">Nincs belépve — a mentett járművek belépés után érhetők el.</span>
+    <div class="authbtns">
+      <button class="minibtn" id="btnLogin" onclick="openLogin()" data-i18n="login">Belépés</button>
+      <button class="minibtn alt" id="btnReg" onclick="doRegister()" data-i18n="register">Regisztráció</button>
+      <button class="minibtn alt" id="btnLogout" style="display:none" onclick="logout()" data-i18n="logout">Kilépés</button>
+    </div>
+  </div>
   <div class="inputs">
-      <div class="card full" id="savedCard">
+      <div class="card full" id="savedCard" style="display:none">
         <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.5 9a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span data-i18n="c_saved">Mentett járművek</span></h2>
         <label><span class="lab" data-i18n="saved_pick">Korábbi jármű betöltése</span>
           <select id="savedVeh" class="savedsel" onchange="loadVehicle(this.value)"><option value="">—</option></select>
@@ -171,9 +192,19 @@
         <p id="savedStatus" class="help" style="min-height:16px;margin-top:8px"></p>
       </div>
 
-      <div class="card">
+      <div class="card full">
         <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-3a2 2 0 0 1 4 0v3"/></svg><span data-i18n="c_company">Cég</span></h2>
         <label><span class="lab" data-i18n="company_name">Cég neve</span><input id="ceg" oninput="render()" data-i18n-ph="company_name" placeholder="Cég neve"></label>
+        <div class="grid2">
+          <label><span class="lab" data-i18n="taxnum">Adószám</span><input id="adoszam" oninput="render()" onblur="checkTax()" data-i18n-ph="taxnum" placeholder="12345678-1-23"></label>
+          <label><span class="lab" data-i18n="euvat">EU adószám (ha van)</span><input id="euvat" oninput="render()" onblur="checkTax(true)" data-i18n-ph="euvat" placeholder="HU12345678"></label>
+        </div>
+        <p id="vatStatus" class="help" style="min-height:16px;margin:-4px 0 10px"></p>
+        <div class="grid3">
+          <label><span class="lab" data-i18n="zip">Irányítószám</span><input id="irsz" oninput="render()" data-i18n-ph="zip" placeholder="1234"></label>
+          <label style="grid-column:span 2"><span class="lab" data-i18n="city">Város</span><input id="varos" oninput="render()" data-i18n-ph="city" placeholder="Város"></label>
+        </div>
+        <label><span class="lab" data-i18n="street">Cím (utca, házszám)</span><input id="utca" oninput="render()" data-i18n-ph="street" placeholder="Utca, házszám"></label>
       </div>
 
       <div class="card">
@@ -241,6 +272,29 @@
 
 </div>
 
+<!-- Belépés ablak -->
+<div id="loginModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeLogin()">×</button>
+    <h3 data-i18n="login_title">Belépés</h3>
+    <label><span class="lab" data-i18n="login_code">Belépőkód</span><input id="loginCode" placeholder="XXXX-XXXX" autocomplete="off"></label>
+    <button class="sendbtn" onclick="doLogin()" data-i18n="login_btn">Belépés</button>
+    <p id="loginStatus" class="help" style="min-height:16px;margin-top:8px"></p>
+    <p class="help" data-i18n="login_hint">Nincs még kódod? Töltsd ki a cégadatokat, és nyomd meg a „Regisztráció" gombot a fenti sávban.</p>
+  </div>
+</div>
+
+<!-- Belépőkód megjelenítése regisztráció után -->
+<div id="codeModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeCode()">×</button>
+    <h3 data-i18n="reg_done_title">Sikeres regisztráció</h3>
+    <p class="help" data-i18n="reg_done_hint">Ez a belépőkódod. Írd fel és őrizd meg — ezzel tudsz legközelebb belépni, és elérni a mentett járműveket.</p>
+    <div class="codebox" id="newCode">----</div>
+    <button class="sendbtn" onclick="closeCode()" data-i18n="reg_done_ok">Rendben, megjegyeztem</button>
+  </div>
+</div>
+
 <script>
   let dists = [];   // strings
   let loads = [];
@@ -252,8 +306,8 @@
   const ALIAS={at:'de', be:'fr'};
   let curLang='hu';
   const T={
-    hu:{app_title:"Útvonalengedély bekérő",app_sub:"Egyszerű adatbevitel",send:"Elküld",pdf:"PDF",c_company:"Cég",c_vehicle:"Jármű (vontató)",c_trailers:"Pótkocsik",c_dims:"Méretek",c_route:"Útvonal",c_datenote:"Dátum & megjegyzés",c_axles:"Tengelyek",c_send:"Küldés",company_name:"Cég neve",plate:"Rendszám",axle_count:"Tengelyek száma",driven_hint:"A hajtott tengelyt a vontató kerekére kattintva jelöld ki.",length:"Hosszúság (m)",width:"Szélesség (m)",height:"Magasság (m)",gross:"Össztömeg (t)",from:"Honnan",to:"Hová",goods:"Áru",datetime:"Dátum, időpont",note:"Megjegyzés",copy_email:"Másolat e-mail cím",axle_legend:"Kör = tengely · fölötte a terhelés · közötte a távolság. Hajtott tengely: kattints a vontató kerekére.",sub_dist:"Tengelytávolságok (m)",sub_load:"Tengelyterhelések (t)",dia_show:"▸ Tengelyábra megjelenítése",dia_hide:"▾ Tengelyábra elrejtése",forg_check:"Nincs még regisztrálva (forgalmi engedély szükséges)",forg_both:"Forgalmi engedély mindkét oldala:",forg_front:"Elülső",forg_back:"Hátsó",forg_btn:"📷 Fotó / feltöltés",trailer:"Pótkocsi",del:"Törlés",add_trailer:"+ Pótkocsi hozzáadása",send_full:"Megrendelés elküldése",prev_hint:"Előnézet — itt is szerkeszthető · nyomtatható",st_sending:"Küldés folyamatban…",st_sent:"Elküldve ✓",c_saved:"Mentett járművek",saved_pick:"Korábbi jármű betöltése",saved_save:"＋ Aktuális jármű mentése",saved_del:"🗑 Kiválasztott törlése",sv_name:"Add meg a jármű nevét (pl. rendszám vagy ügyfél):",sv_saving:"Mentés…",sv_saved:"Elmentve ✓",sv_loading:"Betöltés…",sv_loaded:"Betöltve ✓",sv_deleting:"Törlés…",sv_deleted:"Törölve ✓",sv_delconfirm:"Biztosan törlöd a kiválasztott járművet?",sv_pickfirst:"Előbb válassz egy mentett járművet.",sv_pin:"Add meg a járműtár PIN kódját:",sv_err:"Járműtár hiba: "},
-    en:{app_title:"Route permit request",app_sub:"Simple data entry",send:"Send",pdf:"PDF",c_company:"Company",c_vehicle:"Vehicle (tractor)",c_trailers:"Trailers",c_dims:"Dimensions",c_route:"Route",c_datenote:"Date & note",c_axles:"Axles",c_send:"Send",company_name:"Company name",plate:"Licence plate",axle_count:"Number of axles",driven_hint:"Mark the driven axle by tapping a tractor wheel.",length:"Length (m)",width:"Width (m)",height:"Height (m)",gross:"Gross weight (t)",from:"From",to:"To",goods:"Goods",datetime:"Date, time",note:"Note",copy_email:"Copy to e-mail address",axle_legend:"Circle = axle · load above · distance between. Driven axle: tap a tractor wheel.",sub_dist:"Axle distances (m)",sub_load:"Axle loads (t)",dia_show:"▸ Show axle diagram",dia_hide:"▾ Hide axle diagram",forg_check:"Not yet registered (vehicle registration needed)",forg_both:"Both sides of the registration certificate:",forg_front:"Front",forg_back:"Back",forg_btn:"📷 Photo / upload",trailer:"Trailer",del:"Delete",add_trailer:"+ Add trailer",send_full:"Send order",prev_hint:"Preview — editable here too · printable",st_sending:"Sending…",st_sent:"Sent ✓",c_saved:"Saved vehicles",saved_pick:"Load a previous vehicle",saved_save:"＋ Save current vehicle",saved_del:"🗑 Delete selected",sv_name:"Enter a name for the vehicle (e.g. plate or client):",sv_saving:"Saving…",sv_saved:"Saved ✓",sv_loading:"Loading…",sv_loaded:"Loaded ✓",sv_deleting:"Deleting…",sv_deleted:"Deleted ✓",sv_delconfirm:"Delete the selected vehicle?",sv_pickfirst:"Pick a saved vehicle first.",sv_pin:"Enter the vehicle store PIN:",sv_err:"Vehicle store error: "},
+    hu:{app_title:"Útvonalengedély bekérő",app_sub:"Egyszerű adatbevitel",send:"Elküld",pdf:"PDF",c_company:"Cég",c_vehicle:"Jármű (vontató)",c_trailers:"Pótkocsik",c_dims:"Méretek",c_route:"Útvonal",c_datenote:"Dátum & megjegyzés",c_axles:"Tengelyek",c_send:"Küldés",company_name:"Cég neve",plate:"Rendszám",axle_count:"Tengelyek száma",driven_hint:"A hajtott tengelyt a vontató kerekére kattintva jelöld ki.",length:"Hosszúság (m)",width:"Szélesség (m)",height:"Magasság (m)",gross:"Össztömeg (t)",from:"Honnan",to:"Hová",goods:"Áru",datetime:"Dátum, időpont",note:"Megjegyzés",copy_email:"Másolat e-mail cím",axle_legend:"Kör = tengely · fölötte a terhelés · közötte a távolság. Hajtott tengely: kattints a vontató kerekére.",sub_dist:"Tengelytávolságok (m)",sub_load:"Tengelyterhelések (t)",dia_show:"▸ Tengelyábra megjelenítése",dia_hide:"▾ Tengelyábra elrejtése",forg_check:"Nincs még regisztrálva (forgalmi engedély szükséges)",forg_both:"Forgalmi engedély mindkét oldala:",forg_front:"Elülső",forg_back:"Hátsó",forg_btn:"📷 Fotó / feltöltés",trailer:"Pótkocsi",del:"Törlés",add_trailer:"+ Pótkocsi hozzáadása",send_full:"Megrendelés elküldése",prev_hint:"Előnézet — itt is szerkeszthető · nyomtatható",st_sending:"Küldés folyamatban…",st_sent:"Elküldve ✓",c_saved:"Mentett járművek",saved_pick:"Korábbi jármű betöltése",saved_save:"＋ Aktuális jármű mentése",saved_del:"🗑 Kiválasztott törlése",sv_name:"Add meg a jármű nevét (pl. rendszám vagy ügyfél):",sv_saving:"Mentés…",sv_saved:"Elmentve ✓",sv_loading:"Betöltés…",sv_loaded:"Betöltve ✓",sv_deleting:"Törlés…",sv_deleted:"Törölve ✓",sv_delconfirm:"Biztosan törlöd a kiválasztott járművet?",sv_pickfirst:"Előbb válassz egy mentett járművet.",sv_pin:"Add meg a járműtár PIN kódját:",sv_err:"Járműtár hiba: ",taxnum:"Adószám",euvat:"EU adószám (ha van)",zip:"Irányítószám",city:"Város",street:"Cím (utca, házszám)",login:"Belépés",register:"Regisztráció",logout:"Kilépés",auth_anon:"Nincs belépve — a mentett járművek belépés után érhetők el.",logged_as:"Belépve:",login_title:"Belépés",login_code:"Belépőkód",login_btn:"Belépés",login_hint:"Nincs még kódod? Töltsd ki a cégadatokat, és nyomd meg a „Regisztráció” gombot a fenti sávban.",reg_done_title:"Sikeres regisztráció",reg_done_hint:"Ez a belépőkódod. Írd fel és őrizd meg — ezzel tudsz legközelebb belépni, és elérni a mentett járműveket.",reg_done_ok:"Rendben, megjegyeztem",vat_checking:"Ellenőrzés…",vat_valid:"✓ Érvényes adószám",vat_invalid:"⚠ A VIES nem találta ezt az adószámot",vat_badformat:"⚠ Hibás adószám-formátum (ellenőrzőszám)",vat_filled:"✓ Érvényes — cégadatok kitöltve",reg_need:"A regisztrációhoz a cégnév és az adószám kötelező.",reg_saving:"Regisztráció…",login_bad:"Hibás belépőkód.",login_ok:"Belépve ✓"},
+    en:{app_title:"Route permit request",app_sub:"Simple data entry",send:"Send",pdf:"PDF",c_company:"Company",c_vehicle:"Vehicle (tractor)",c_trailers:"Trailers",c_dims:"Dimensions",c_route:"Route",c_datenote:"Date & note",c_axles:"Axles",c_send:"Send",company_name:"Company name",plate:"Licence plate",axle_count:"Number of axles",driven_hint:"Mark the driven axle by tapping a tractor wheel.",length:"Length (m)",width:"Width (m)",height:"Height (m)",gross:"Gross weight (t)",from:"From",to:"To",goods:"Goods",datetime:"Date, time",note:"Note",copy_email:"Copy to e-mail address",axle_legend:"Circle = axle · load above · distance between. Driven axle: tap a tractor wheel.",sub_dist:"Axle distances (m)",sub_load:"Axle loads (t)",dia_show:"▸ Show axle diagram",dia_hide:"▾ Hide axle diagram",forg_check:"Not yet registered (vehicle registration needed)",forg_both:"Both sides of the registration certificate:",forg_front:"Front",forg_back:"Back",forg_btn:"📷 Photo / upload",trailer:"Trailer",del:"Delete",add_trailer:"+ Add trailer",send_full:"Send order",prev_hint:"Preview — editable here too · printable",st_sending:"Sending…",st_sent:"Sent ✓",c_saved:"Saved vehicles",saved_pick:"Load a previous vehicle",saved_save:"＋ Save current vehicle",saved_del:"🗑 Delete selected",sv_name:"Enter a name for the vehicle (e.g. plate or client):",sv_saving:"Saving…",sv_saved:"Saved ✓",sv_loading:"Loading…",sv_loaded:"Loaded ✓",sv_deleting:"Deleting…",sv_deleted:"Deleted ✓",sv_delconfirm:"Delete the selected vehicle?",sv_pickfirst:"Pick a saved vehicle first.",sv_pin:"Enter the vehicle store PIN:",sv_err:"Vehicle store error: ",taxnum:"Tax number",euvat:"EU VAT (if any)",zip:"Postal code",city:"City",street:"Address (street, no.)",login:"Log in",register:"Register",logout:"Log out",auth_anon:"Not logged in — saved vehicles are available after login.",logged_as:"Logged in:",login_title:"Log in",login_code:"Access code",login_btn:"Log in",login_hint:"No code yet? Fill in the company details and press “Register” in the bar above.",reg_done_title:"Registration complete",reg_done_hint:"This is your access code. Write it down and keep it — you'll use it to log in and reach your saved vehicles.",reg_done_ok:"OK, noted",vat_checking:"Checking…",vat_valid:"✓ Valid tax number",vat_invalid:"⚠ VIES did not find this tax number",vat_badformat:"⚠ Invalid tax number format (checksum)",vat_filled:"✓ Valid — company details filled in",reg_need:"Company name and tax number are required to register.",reg_saving:"Registering…",login_bad:"Invalid access code.",login_ok:"Logged in ✓"},
     de:{app_title:"Streckengenehmigung anfordern",app_sub:"Einfache Dateneingabe",send:"Senden",pdf:"PDF",c_company:"Firma",c_vehicle:"Fahrzeug (Zugmaschine)",c_trailers:"Anhänger",c_dims:"Maße",c_route:"Route",c_datenote:"Datum & Anmerkung",c_axles:"Achsen",c_send:"Senden",company_name:"Firmenname",plate:"Kennzeichen",axle_count:"Anzahl der Achsen",driven_hint:"Angetriebene Achse durch Tippen auf ein Zugmaschinen-Rad markieren.",length:"Länge (m)",width:"Breite (m)",height:"Höhe (m)",gross:"Gesamtgewicht (t)",from:"Von",to:"Nach",goods:"Ware",datetime:"Datum, Uhrzeit",note:"Anmerkung",copy_email:"Kopie an E-Mail-Adresse",axle_legend:"Kreis = Achse · Last darüber · Abstand dazwischen. Angetriebene Achse: Zugmaschinen-Rad antippen.",sub_dist:"Achsabstände (m)",sub_load:"Achslasten (t)",dia_show:"▸ Achsdiagramm anzeigen",dia_hide:"▾ Achsdiagramm ausblenden",forg_check:"Noch nicht registriert (Zulassung erforderlich)",forg_both:"Beide Seiten des Fahrzeugscheins:",forg_front:"Vorderseite",forg_back:"Rückseite",forg_btn:"📷 Foto / Hochladen",trailer:"Anhänger",del:"Löschen",add_trailer:"+ Anhänger hinzufügen",send_full:"Bestellung senden",prev_hint:"Vorschau — auch hier bearbeitbar · druckbar",st_sending:"Senden…",st_sent:"Gesendet ✓"},
     ro:{app_title:"Cerere autorizație de traseu",app_sub:"Introducere simplă a datelor",send:"Trimite",pdf:"PDF",c_company:"Firmă",c_vehicle:"Vehicul (cap tractor)",c_trailers:"Remorci",c_dims:"Dimensiuni",c_route:"Traseu",c_datenote:"Dată & observație",c_axles:"Axe",c_send:"Trimite",company_name:"Numele firmei",plate:"Număr de înmatriculare",axle_count:"Număr de axe",driven_hint:"Marchează axa motoare atingând o roată a capului tractor.",length:"Lungime (m)",width:"Lățime (m)",height:"Înălțime (m)",gross:"Masă totală (t)",from:"De la",to:"Către",goods:"Marfă",datetime:"Data, ora",note:"Observație",copy_email:"Copie la adresa de e-mail",axle_legend:"Cerc = axă · sarcina deasupra · distanța între. Axa motoare: atinge o roată a tractorului.",sub_dist:"Distanțe între axe (m)",sub_load:"Sarcini pe axe (t)",dia_show:"▸ Arată diagrama axelor",dia_hide:"▾ Ascunde diagrama axelor",forg_check:"Neînregistrat încă (certificat de înmatriculare necesar)",forg_both:"Ambele fețe ale certificatului de înmatriculare:",forg_front:"Față",forg_back:"Spate",forg_btn:"📷 Foto / încărcare",trailer:"Remorcă",del:"Șterge",add_trailer:"+ Adaugă remorcă",send_full:"Trimite comanda",prev_hint:"Previzualizare — editabilă și aici · imprimabilă",st_sending:"Se trimite…",st_sent:"Trimis ✓"},
     sk:{app_title:"Žiadosť o povolenie trasy",app_sub:"Jednoduché zadávanie údajov",send:"Odoslať",pdf:"PDF",c_company:"Firma",c_vehicle:"Vozidlo (ťahač)",c_trailers:"Prívesy",c_dims:"Rozmery",c_route:"Trasa",c_datenote:"Dátum & poznámka",c_axles:"Nápravy",c_send:"Odoslať",company_name:"Názov firmy",plate:"ŠPZ",axle_count:"Počet náprav",driven_hint:"Hnaciu nápravu označíš kliknutím na koleso ťahača.",length:"Dĺžka (m)",width:"Šírka (m)",height:"Výška (m)",gross:"Celková hmotnosť (t)",from:"Odkiaľ",to:"Kam",goods:"Tovar",datetime:"Dátum, čas",note:"Poznámka",copy_email:"Kópia na e-mailovú adresu",axle_legend:"Kruh = náprava · zaťaženie hore · vzdialenosť medzi. Hnacia náprava: klikni na koleso ťahača.",sub_dist:"Vzdialenosti náprav (m)",sub_load:"Zaťaženie náprav (t)",dia_show:"▸ Zobraziť schému náprav",dia_hide:"▾ Skryť schému náprav",forg_check:"Ešte neregistrované (potrebné osvedčenie o evidencii)",forg_both:"Obe strany osvedčenia o evidencii:",forg_front:"Predná strana",forg_back:"Zadná strana",forg_btn:"📷 Foto / nahrať",trailer:"Príves",del:"Vymazať",add_trailer:"+ Pridať príves",send_full:"Odoslať objednávku",prev_hint:"Náhľad — upraviteľné aj tu · tlačiteľné",st_sending:"Odosielanie…",st_sent:"Odoslané ✓"},
@@ -459,6 +513,9 @@
     const L=[];
     L.push('ÚTVONALENGEDÉLY MEGRENDELÉS'); L.push('');
     L.push('Cég: '+val('ceg'));
+    if(val('adoszam')) L.push('Adószám: '+val('adoszam'));
+    if(val('euvat')) L.push('EU adószám: '+val('euvat'));
+    if(val('irsz')||val('varos')||val('utca')) L.push('Cím: '+[val('irsz'),val('varos'),val('utca')].filter(x=>x).join(' '));
     L.push('Jármű (vontató): '+val('j_rsz')+' — '+val('j_t')+' tengely, hajtott: '+drivenCount());
     trailers.forEach((t,k)=>L.push('Pótkocsi '+(k+1)+': '+(t.rsz||'')+' — '+(t.t||0)+' tengely'));
     L.push('');
@@ -527,32 +584,127 @@
     }
   }
 
-  // === Mentett járművek (Cloudflare KV a Worker mögött) ===
+  // === Cégfiók: belépés / regisztráció ===
+  let company = null; // {code, name, taxnum, euvat, zip, city, address}
+  function getCode(){ try{ return localStorage.getItem('ue_code')||''; }catch(e){ return ''; } }
+  function setCode(c){ try{ if(c) localStorage.setItem('ue_code', c); else localStorage.removeItem('ue_code'); }catch(e){} }
+
+  async function api(payload){
+    const res=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j=await res.json().catch(()=>({}));
+    if(!res.ok || !j.success){ const e=new Error((j&&j.message)?j.message:('HTTP '+res.status)); e.status=res.status; throw e; }
+    return j;
+  }
+
+  function fillCompany(c){
+    if(!c) return;
+    document.getElementById('ceg').value=c.name||'';
+    document.getElementById('adoszam').value=c.taxnum||'';
+    document.getElementById('euvat').value=c.euvat||'';
+    document.getElementById('irsz').value=c.zip||'';
+    document.getElementById('varos').value=c.city||'';
+    document.getElementById('utca').value=c.address||'';
+    render();
+  }
+  function readCompany(){
+    return {
+      name:val('ceg'), taxnum:val('adoszam'), euvat:val('euvat'),
+      zip:val('irsz'), city:val('varos'), address:val('utca')
+    };
+  }
+  function applyAuthUI(){
+    const info=document.getElementById('authInfo');
+    const bIn=document.getElementById('btnLogin'), bReg=document.getElementById('btnReg'), bOut=document.getElementById('btnLogout');
+    const card=document.getElementById('savedCard');
+    if(company){
+      info.innerHTML = t('logged_as')+' <b>'+esc(company.name||'')+'</b> ('+esc(company.code||'')+')';
+      bIn.style.display='none'; bReg.style.display='none'; bOut.style.display='';
+      card.style.display='';
+    } else {
+      info.textContent = t('auth_anon');
+      bIn.style.display=''; bReg.style.display=''; bOut.style.display='none';
+      card.style.display='none';
+    }
+  }
+  function openLogin(){ document.getElementById('loginModal').style.display='flex'; document.getElementById('loginStatus').textContent=''; }
+  function closeLogin(){ document.getElementById('loginModal').style.display='none'; }
+  function closeCode(){ document.getElementById('codeModal').style.display='none'; }
+
+  async function doLogin(){
+    const code=(document.getElementById('loginCode').value||'').trim();
+    const st=document.getElementById('loginStatus');
+    if(!code){ st.textContent=t('login_code'); st.style.color='var(--muted)'; return; }
+    st.textContent='…'; st.style.color='var(--muted)';
+    try{
+      const j=await api({action:'login', code});
+      company=j.company; setCode(company.code);
+      fillCompany(company); applyAuthUI(); closeLogin();
+      await refreshVehicles();
+    }catch(e){ st.textContent=(e.status===404)?t('login_bad'):(''+(e&&e.message?e.message:e)); st.style.color='#c0563f'; }
+  }
+
+  async function doRegister(){
+    const c=readCompany();
+    if(!c.name || !c.taxnum){ setVat(t('reg_need'), false); return; }
+    setVat(t('reg_saving'));
+    try{
+      const j=await api({action:'register', company:c});
+      company=j.company; setCode(company.code);
+      document.getElementById('newCode').textContent=company.code;
+      document.getElementById('codeModal').style.display='flex';
+      applyAuthUI(); setVat(''); await refreshVehicles();
+    }catch(e){ setVat(t('sv_err')+(e&&e.message?e.message:e), false); }
+  }
+
+  function logout(){ company=null; setCode(''); applyAuthUI(); const dd=document.getElementById('savedVeh'); if(dd) dd.innerHTML='<option value=""></option>'; }
+
+  // === Adószám-ellenőrzés (VIES) ===
+  function setVat(msg, ok){
+    const s=document.getElementById('vatStatus');
+    if(s){ s.textContent=msg||''; s.style.color = ok===true ? '#2e7d46' : (ok===false ? '#c0563f' : 'var(--muted)'); }
+  }
+  async function checkTax(isEu){
+    const euRaw=(val('euvat')||'').replace(/\s/g,'');
+    const huRaw=(val('adoszam')||'').replace(/[^0-9]/g,'');
+    let country, number;
+    if(isEu && euRaw){ country=euRaw.slice(0,2).toUpperCase(); number=euRaw.slice(2); }
+    else if(huRaw.length>=8){ country='HU'; number=huRaw.slice(0,8); }
+    else if(euRaw){ country=euRaw.slice(0,2).toUpperCase(); number=euRaw.slice(2); }
+    else { setVat(''); return; }
+    setVat(t('vat_checking'));
+    try{
+      const j=await api({action:'vat_check', country, number});
+      if(j.checksumOk===false){ setVat(t('vat_badformat'), false); return; }
+      if(j.valid===true){
+        let filled=false;
+        if(j.name && !val('ceg')){ document.getElementById('ceg').value=j.name; filled=true; }
+        if(j.zip && !val('irsz')){ document.getElementById('irsz').value=j.zip; filled=true; }
+        if(j.city && !val('varos')){ document.getElementById('varos').value=j.city; filled=true; }
+        if(j.street && !val('utca')){ document.getElementById('utca').value=j.street; filled=true; }
+        render();
+        setVat(filled? t('vat_filled') : t('vat_valid'), true);
+      } else if(j.valid===false){ setVat(t('vat_invalid'), false); }
+      else { setVat(j.message||'', null); }
+    }catch(e){ setVat('', null); }
+  }
+
+  // === Mentett járművek (cégenként, a Worker + KV mögött) ===
   function svStatus(msg, ok){
     const s=document.getElementById('savedStatus');
     if(s){ s.textContent=msg||''; s.style.color = ok===true ? '#2e7d46' : (ok===false ? '#c0563f' : 'var(--muted)'); }
   }
-  function getPin(){ try{ return localStorage.getItem('veh_pin')||''; }catch(e){ return ''; } }
-  function setPin(p){ try{ localStorage.setItem('veh_pin', p); }catch(e){} }
-
-  async function vehApi(payload, _retry){
-    const body=Object.assign({pin:getPin()}, payload);
-    const res=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const j=await res.json().catch(()=>({}));
-    if(res.status===403 && !_retry){
-      const p=prompt(t('sv_pin')); if(p){ setPin(p); return vehApi(payload, true); }
-    }
-    if(!res.ok || !j.success){ throw new Error((j&&j.message)?j.message:('HTTP '+res.status)); }
-    return j;
+  async function vehApi(payload){
+    if(!company){ throw new Error(t('auth_anon')); }
+    return api(Object.assign({code:company.code}, payload));
   }
-
   async function refreshVehicles(sel){
+    if(!company) return;
     try{
-      const j=await vehApi({action:'list'});
+      const j=await vehApi({action:'veh_list'});
       const dd=document.getElementById('savedVeh');
       dd.innerHTML='<option value="">—</option>'+j.items.map(it=>`<option value="${esc(it.id)}">${esc(it.name)}</option>`).join('');
       if(sel) dd.value=sel;
-    }catch(e){ /* csendben – lehet, hogy még nincs beállítva a KV */ }
+    }catch(e){ /* csendben */ }
   }
 
   function dataURLtoFile(dataurl, filename){
@@ -585,7 +737,7 @@
       tractor: photoOut(tractor)
     };
     svStatus(t('sv_saving'));
-    try{ const j=await vehApi({action:'save', vehicle:v}); await refreshVehicles(j.id); svStatus(t('sv_saved'), true); }
+    try{ const j=await vehApi({action:'veh_save', vehicle:v}); await refreshVehicles(j.id); svStatus(t('sv_saved'), true); }
     catch(e){ svStatus(t('sv_err')+(e&&e.message?e.message:e), false); }
   }
 
@@ -593,7 +745,7 @@
     if(!id) return;
     svStatus(t('sv_loading'));
     try{
-      const j=await vehApi({action:'get', id});
+      const j=await vehApi({action:'veh_get', id});
       const v=j.vehicle||{};
       document.getElementById('j_rsz').value=v.j_rsz||'';
       document.getElementById('j_t').value=v.j_t||'';
@@ -610,13 +762,15 @@
     if(!id){ svStatus(t('sv_pickfirst'), false); return; }
     if(!confirm(t('sv_delconfirm'))) return;
     svStatus(t('sv_deleting'));
-    try{ await vehApi({action:'delete', id}); await refreshVehicles(); svStatus(t('sv_deleted'), true); }
+    try{ await vehApi({action:'veh_delete', id}); await refreshVehicles(); svStatus(t('sv_deleted'), true); }
     catch(e){ svStatus(t('sv_err')+(e&&e.message?e.message:e), false); }
   }
 
   loadExample();
   applyLang((document.getElementById('lang')||{}).value || 'hu');
-  refreshVehicles();
+  applyAuthUI();
+  // korábbi belépés visszaállítása
+  (async()=>{ const code=getCode(); if(code){ try{ const j=await api({action:'login', code}); company=j.company; fillCompany(company); applyAuthUI(); await refreshVehicles(); }catch(e){ setCode(''); } } })();
   window.addEventListener('load', fitDiagram);
   setTimeout(fitDiagram, 250);
 
