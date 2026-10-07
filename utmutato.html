@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Felhasználói útmutató – Közútkezelői hozzájárulás igénylése</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d49a1f;--gold-soft:#e7c66a;--ink:#1f2530;--bg:#f3f5f8;--card:#fff;--border:#dde2e9;--txt:#2a3140;--muted:#7a8595;--accent:#c8961a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Hanken Grotesk',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .top{background:#fff;border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:10;}
+  .top .wrap{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#9c7212);display:grid;place-items:center;color:#fff;font-family:'Saira Condensed';font-weight:700;font-size:18px;}
+  .top h1{font-family:'Saira Condensed';font-size:17px;text-transform:uppercase;letter-spacing:.4px;}
+  .back{margin-left:auto;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;border:1.5px solid var(--gold);padding:7px 12px;border-radius:9px;}
+  main{max-width:880px;margin:0 auto;padding:24px 16px 80px;}
+  h2{font-family:'Saira Condensed';font-size:26px;text-transform:uppercase;letter-spacing:.5px;margin:30px 0 10px;color:var(--ink);}
+  h3{font-size:18px;font-weight:700;margin:22px 0 6px;color:var(--ink);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 22px;}
+  li{margin:5px 0;}
+  .lead{font-size:18px;color:var(--muted);margin:6px 0 18px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:16px 0;}
+  .step{display:flex;gap:14px;margin:14px 0;}
+  .num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--gold-soft);color:var(--ink);font-weight:700;display:grid;place-items:center;font-family:'Saira Condensed';}
+  .tip{background:#fff7e8;border:1px solid var(--gold-soft);border-radius:10px;padding:12px 14px;margin:12px 0;font-size:14.5px;}
+  .toc a{color:var(--accent);text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  b,strong{color:var(--ink);}
+  footer{max-width:880px;margin:0 auto;padding:20px 16px 50px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap"><div class="mark">Ú</div><h1>Felhasználói útmutató</h1><a class="back" href="index.html">← Vissza az igénylőhöz</a></div></div>
+<main>
+  <p class="lead">Lépésről lépésre a túlsúlyos és túlméretes járművek közútkezelői hozzájárulásának (útvonalengedélyének) igényléséhez.</p>
+
+  <div class="card toc">
+    <h3 style="margin-top:0">Tartalom</h3>
+    <ol>
+      <li><a href="#cel">Mire való ez a szolgáltatás?</a></li>
+      <li><a href="#belepes">Regisztráció és belépés</a></li>
+      <li><a href="#ceg">Cégadatok</a></li>
+      <li><a href="#jarmu">Jármű- és szerelvénykezelés</a></li>
+      <li><a href="#tengely">Tengelyadatok</a></li>
+      <li><a href="#meret">Méretek és tömeg</a></li>
+      <li><a href="#utvonal">Útvonal és áru</a></li>
+      <li><a href="#doku">Dokumentumok feltöltése</a></li>
+      <li><a href="#elonezet">Előnézet és szerkesztés</a></li>
+      <li><a href="#elkuldes">Elküldés és fizetési kötelezettség</a></li>
+      <li><a href="#tovabbitas">Az elkészült engedély</a></li>
+    </ol>
+  </div>
+
+  <h2 id="cel">1. Mire való ez a szolgáltatás?</h2>
+  <p>Az oldalon egyszerűen megadhatja egy túlsúlyos vagy túlméretes jármű, illetve járműszerelvény adatait, és ezzel kezdeményezheti a szükséges <b>közútkezelői hozzájárulás / útvonalengedély</b> beszerzését. A megadott adatokat összegezzük, és eljuttatjuk az ügyintézéshez. A cél, hogy minél kevesebb adatot kelljen újra megadnia: a rendszer a korábbi igénylésekből és a mentett járművekből automatikusan visszatölti, ami nem változik.</p>
+
+  <h2 id="belepes">2. Regisztráció és belépés</h2>
+  <p>Belépés <b>nem kötelező</b> – regisztráció nélkül is beküldhet igénylést. Belépéssel viszont elérhetővé válnak a mentett járművek és az automatikus kitöltés.</p>
+  <div class="step"><div class="num">1</div><div><b>Regisztráció:</b> töltse ki a cégadatokat (cégnév, adószám, cím), majd a felső sávban nyomja meg a <b>„Regisztráció"</b> gombot. A rendszer ad egy <b>belépőkódot</b> – ezt írja fel és őrizze meg.</div></div>
+  <div class="step"><div class="num">2</div><div><b>Belépés:</b> a felső sávban a <b>„Belépés"</b> gombnál adja meg a belépőkódot. Belépés után a cégadatai automatikusan betöltődnek.</div></div>
+  <div class="tip">A belépőkód olyan, mint egy jelszó – ne ossza meg illetéktelennel. Ugyanazzal a kóddal telefonról és számítógépről is eléri a mentett járműveit.</div>
+
+  <h2 id="ceg">3. Cégadatok</h2>
+  <p>Add meg a cég nevét, adószámát, irányítószámát, városát és címét. Az <b>adószám</b> mezőből kilépve a rendszer automatikusan ellenőrzi az adatot (VIES), és ha érvényes, kitölti a cég nevét és címét. EU-s közösségi adószám a külön mezőbe írható.</p>
+  <p>Belépve a cégadatok összecsukódnak; a felső sávban a <b>„Cégadatok megtekintése / módosítása"</b> gombbal bármikor megnyithatja, módosíthatja és elmentheti őket.</p>
+
+  <h2 id="jarmu">4. Jármű- és szerelvénykezelés</h2>
+  <p>A rendszer külön kezeli a <b>vontatót</b>, a <b>pótkocsit</b> és a komplett <b>szerelvényt</b> (vontató + egy vagy több pótkocsi).</p>
+  <ul>
+    <li><b>Mentés:</b> a „Mentett járművek" résznél külön elmentheti az aktuális vontatót, pótkocsit vagy a teljes szerelvényt.</li>
+    <li><b>Betöltés:</b> a legördülőkből kiválasztva visszatölti a korábbi adatokat.</li>
+    <li><b>Rendszám-keresés:</b> ahogy a vontató vagy pótkocsi rendszámát gépeli, a rendszer felajánlja a korábban használt járműveket – kiválasztva automatikusan betölti az adatait (tengelyszám, hajtott tengely, forgalmi).</li>
+  </ul>
+  <div class="tip">A hajtott tengelyt a „Tengelyek" résznél a vontató kerekére kattintva jelölheti ki. Ez csak a vontatónál értelmezett.</div>
+
+  <h2 id="tengely">5. Tengelyadatok</h2>
+  <p>A <b>tengelytávolságok</b> és <b>tengelyterhelések</b> kötelező adatok (a mezők <b>*</b>-gal jelöltek). A tengelytávolságok korábbi járműből automatikusan betölthetők és szerkeszthetők. A <b>tengelyterheléseket</b> mindig az adott szállításhoz kell megadni – ezeket a rendszer szándékosan nem tölti vissza automatikusan, mert rakományonként változnak.</p>
+
+  <h2 id="meret">6. Méretek és tömeg</h2>
+  <p>Adja meg a hosszúságot, szélességet, magasságot és az össztömeget. A rendszer figyeli a reális értékeket, és nyilvánvalóan hibás adatot (pl. 300 m hossz) nem enged beküldeni. A tengelyterhelések összege és az össztömeg nem feltétlenül egyezik pontosan – ez nem akadályozza a beküldést.</p>
+
+  <h2 id="utvonal">7. Útvonal és áru</h2>
+  <p>Adja meg, honnan hová történik a szállítás, és nevezze meg az árut. Az áruhoz feltölthető opcionálisan a <b>CMR / szállítmánydokumentum</b> is.</p>
+
+  <h2 id="doku">8. Dokumentumok feltöltése</h2>
+  <p>A forgalmi engedélyről és a szállítmánydokumentumról telefonon <b>új fényképet készíthet</b>, vagy <b>meglévő fájlt választhat</b>. Belépve, mentett járműnél a korábban feltöltött forgalmi a járműhöz kötődik, így nem kell újra feltölteni – de szükség esetén frissíthető.</p>
+
+  <h2 id="elonezet">9. Előnézet és szerkesztés</h2>
+  <p>Beküldés előtt az oldal alján megjelenik az <b>előnézet</b>. Itt szinte minden adat közvetlenül szerkeszthető: rendszámok, tengelyszám, a vontató hajtott tengelye, méretek, össztömeg, tengelytávolságok, tengelyterhelések, útvonal, áru. Ha az előnézetben módosítja a tengelyszámot, a tengelytáv- és terhelés-sorok automatikusan igazodnak.</p>
+
+  <h2 id="elkuldes">10. Elküldés és fizetési kötelezettség</h2>
+  <p>Az oldal tetején és alján is van beküldő gomb (<b>„Engedély bekérése"</b>). Beküldés előtt a rendszer teljes körűen ellenőrzi az adatokat; hiány esetén nem küldi el, pontosan jelzi és a hiányzó mezőhöz görget.</p>
+  <div class="tip"><b>Figyelem:</b> az „Engedély bekérése" gomb megnyomásával Ön megrendeli az útvonalengedély / közútkezelői hozzájárulás beszerzését. A megrendelés <b>fizetési kötelezettséggel jár</b>.</div>
+  <p>Ha megad egy saját e-mail címet a „Saját e-mail cím (másolat)" mezőben, a megrendelésről Ön is kap egy másolatot.</p>
+
+  <h2 id="tovabbitas">11. Az elkészült engedély</h2>
+  <p>A beküldött adatokat az ügyintézéshez továbbítjuk, és kezdeményezzük a hozzájárulás / útvonalengedély beszerzését a Magyar Közút megfelelő rendszerén keresztül. Az elkészült engedélyt ezt követően eljuttatjuk Önnek a megadott elérhetőségre.</p>
+
+  <div class="tip">Kérdés esetén keresse ügyfélszolgálatunkat a főoldalon megadott elérhetőségen. A személyes adatok kezeléséről az <a href="adatkezeles.html">Adatkezelési tájékoztatóban</a>, a szolgáltatás feltételeiről az <a href="aszf.html">ÁSZF-ben</a> olvashat.</div>
+</main>
+<footer>Közútkezelői hozzájárulás igénylése · Felhasználói útmutató · <a href="index.html" style="color:var(--accent)">Vissza az igénylőhöz</a></footer>
+</body>
+</html>
