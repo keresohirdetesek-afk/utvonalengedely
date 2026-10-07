@@ -308,13 +308,6 @@
         <div class="sub" style="margin-top:14px" data-i18n="sub_load">Tengelyterhelések (t)</div>
         <div class="ingrid" id="loadGrid"></div>
       </div>
-
-      <div class="card full">
-        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span data-i18n="c_send">Küldés</span></h2>
-        <button class="sendbtn" onclick="sendOrder()">✉ <span data-i18n="send_full">Megrendelés elküldése</span></button>
-        <p id="sendStatus" class="help" style="min-height:18px;margin-top:8px"></p>
-        <p class="help">Kattintásra automatikusan elküldi a megrendelést a forgalmi fotókkal együtt.</p>
-      </div>
   </div>
 
   <!-- PREVIEW -->
@@ -708,6 +701,9 @@
     if(tO && !(tO.value||'').trim()){ tO.classList.add('invalid'); fail(tO, t('form_incomplete')); }
     // pótkocsi rendszámok
     trailers.forEach((tr,k)=>{ if(!(tr.rsz||'').trim()){ const box=document.getElementById('trailerList'); fail(box?box.querySelector('input'):null, t('form_incomplete')); } });
+    // belépve a cégadatok rejtve lehetnek – ha ott van hiba, nyissuk ki
+    const cegCard=document.getElementById('cegCard');
+    if(cegCard && cegCard.style.display==='none' && cegCard.querySelector('.invalid')){ cegCard.style.display=''; }
     if(firstBad && firstBad.scrollIntoView){ firstBad.scrollIntoView({behavior:'smooth',block:'center'}); try{firstBad.focus();}catch(e){} }
     return { ok:!firstBad, msg };
   }
