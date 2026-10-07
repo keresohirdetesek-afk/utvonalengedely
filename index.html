@@ -561,8 +561,8 @@
         <tr><td class="lgl">Cég:</td><td class="company" colspan="3" contenteditable="true" data-field="ceg">${esc(val('ceg'))||'&nbsp;'}</td></tr>
         <tr class="sp"><td colspan="4"></td></tr>
         <tr><td style="border:none"></td><td class="lg">Rendszám:</td><td class="lg">Tengelyek száma:</td><td class="lg">Hajtott tengelyek:</td></tr>
-        <tr><td class="lgl">Jármű:</td><td class="big" contenteditable="true" data-field="j_rsz">${esc(val('j_rsz'))||'&nbsp;'}</td><td class="big">${esc(val('j_t'))||'&nbsp;'}</td><td class="big">${drivenCount()}</td></tr>
-        ${trailers.map((t,k)=>`<tr><td class="lgl">Pótkocsi${trailers.length>1?(' '+(k+1)):''}:</td><td class="big" contenteditable="true" data-trailer="${k}">${esc(t.rsz)||'&nbsp;'}</td><td class="big">${esc(String(t.t))||'&nbsp;'}</td><td class="big">0</td></tr>`).join('')}
+        <tr><td class="lgl">Jármű:</td><td class="big" contenteditable="true" data-field="j_rsz">${esc(val('j_rsz'))||'&nbsp;'}</td><td class="big"><span class="ce" contenteditable="true" data-jt="1">${esc(val('j_t'))||'&nbsp;'}</span></td><td class="big"><span class="ce" contenteditable="true" data-driven="1">${drivenCount()}</span></td></tr>
+        ${trailers.map((t,k)=>`<tr><td class="lgl">Pótkocsi${trailers.length>1?(' '+(k+1)):''}:</td><td class="big" contenteditable="true" data-trailer="${k}">${esc(t.rsz)||'&nbsp;'}</td><td class="big"><span class="ce" contenteditable="true" data-tt="${k}">${esc(String(t.t))||'&nbsp;'}</span></td><td class="big">0</td></tr>`).join('')}
         <tr class="sp"><td colspan="4"></td></tr>
         <tr><td class="lgl" rowspan="2" style="vertical-align:middle">Méretek:</td><td class="lg">Hosszúság:</td><td class="lg">Szélesség:</td><td class="lg">Magasság:</td></tr>
         <tr><td class="big"><span class="ce" contenteditable="true" data-field="m_h">${esc(val('m_h'))}</span> m</td><td class="big"><span class="ce" contenteditable="true" data-field="m_sz">${esc(val('m_sz'))}</span> m</td><td class="big"><span class="ce" contenteditable="true" data-field="m_m">${esc(val('m_m'))}</span> m</td></tr>
@@ -1003,7 +1003,12 @@
     else if(ds.trailer!=null){ if(trailers[+ds.trailer]){ trailers[+ds.trailer].rsz=txt; buildTrailers(); } }
     else if(ds.dist!=null){ dists[+ds.dist]=txt; buildAxleInputs(); buildDiagram(); }
     else if(ds.load!=null){ loads[+ds.load]=txt; buildAxleInputs(); buildDiagram(); }
+    else if(ds.jt!=null){ const v=parseInt(txt,10); if(!isNaN(v)&&v>0){ document.getElementById('j_t').value=v; buildAxleInputs(); buildDiagram(); } }
+    else if(ds.tt!=null){ const v=parseInt(txt,10); if(!isNaN(v)&&v>=0&&trailers[+ds.tt]){ trailers[+ds.tt].t=v; buildTrailers(); buildAxleInputs(); buildDiagram(); } }
+    else if(ds.driven!=null){ const v=parseInt(txt,10); if(!isNaN(v)){ const jt=num('j_t'); for(let i=0;i<Math.max(jt,driven.length);i++) driven[i]=(i<jt && i<v); buildDiagram(); } }
   });
+  // a cella elhagy\u00e1sakor az el\u0151n\u00e9zet teljesen \u00fajraszinkroniz\u00e1l\u00f3dik (pl. tengelysz\u00e1m-v\u00e1ltoz\u00e1s ut\u00e1n a sorok)
+  document.getElementById('doc').addEventListener('focusout', ()=>{ setTimeout(render, 10); });
 </script>
 </body>
 </html>
